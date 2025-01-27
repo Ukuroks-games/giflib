@@ -1,9 +1,4 @@
-# Roblox project template
+# Giflib
 
-Just template of project for roblox game for vscode
+library for creating gifs
 
-## Projects
-
-`tests.project.json` - project with unit tests
-
-`roblox-project-template.project.json` - project with game
