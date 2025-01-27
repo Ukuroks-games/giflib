@@ -1,0 +1,30 @@
+[package]
+name = "owner/packageName"
+
+description = "description of package"
+
+version = "0.1.0"
+
+registry = "https://github.com/UpliftGames/wally-index"
+
+# or server
+realm = "shared"
+
+license = ""
+
+repository = "https://github/"
+
+authors = ["You <you mail>"]
+
+exclude = ["packageName.rbxl"]
+
+private = false
+
+[dependencies]
+
+
+[server-dependencies]
+
+
+[dev-dependencies]
+
