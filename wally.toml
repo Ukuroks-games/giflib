@@ -1,9 +1,9 @@
 [package]
-name = "egor00f/egor00f"
+name = "egor00f/giflib"
 
 description = "Library for creating gifs"
 
-version = "0.1.0"
+version = "0.1.1"
 
 registry = "https://github.com/UpliftGames/wally-index"
 
@@ -16,15 +16,16 @@ repository = "https://github.com/Ukuroks-games/giflib"
 
 authors = ["Egor00f <velikiydolbayeb@gmail.com>"]
 
-exclude = ["packageName.rbxl"]
+exclude = ["*"]
+
+include = ["src", "src/**", "wally.toml", "README.md", "init.lua"]
 
 private = false
 
 [dependencies]
-
+stdlib = "egor00f/stdlib@0.1.5"
 
 [server-dependencies]
 
 
 [dev-dependencies]
-

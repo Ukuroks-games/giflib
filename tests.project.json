@@ -4,16 +4,19 @@
 		"$className": "DataModel",
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",
-			"Packages": { 
-				"$path": "Packages"
+			"shared": { 
+				"$path": "src"
 			},
-			"DevPackages": { 
-				"$path": "DevPackages"
+			"Packages": {
+				"$path": "Packages"
 			}
 		},
-		"Workspace": {
-			"$className": "Workspace",
-			"$path": "tests"
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"$path": "tests"
+			}
 		}
 	}
 }
