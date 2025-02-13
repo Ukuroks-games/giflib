@@ -6,10 +6,18 @@ local algorithm = require(ReplicatedStorage.Packages.stdlib).algorithm
 local giflib = {}
 
 export type GifImage = {
-	Image: string,
+
+	Image: ImageLabel,
+
+	--[[
+		delay on this image
+	]]
 	Time: number
 }
 
+--[[
+	Gif struct
+]]
 export type Gif = {
 	--[[
 		Список кадров в гифке
@@ -19,7 +27,14 @@ export type Gif = {
 		GifImage
 	},
 
-	ImageLabel: ImageLabel,
+	--[[
+		Gif surface
+	]]
+	ImageLabel: Frame,
+
+	--[[
+		Current frame
+	]]
 	Frame: number,
 
 	--[[
@@ -28,14 +43,46 @@ export type Gif = {
 	AnimationRunning: boolean,
 
 	--[[
-		Гифка зацикленна
+		Гифка зацикленна.
+
+		if true animation is will be looped.
 	]]
 	LoopAnimation: boolean,
 
+	--[[
+		Images already preloaded
+	]]
+	IsLoaded: boolean,
+
+	--[[
+		Start Gif animation
+	]]
 	StartAnimation: (self: Gif)->any,
+
+	--[[
+		Stop gif animation
+	]]
 	StopAnimation: (self: Gif)->any,
+
+	--[[
+		Reset animation.
+		if animation runnning now, run gif from first image
+	]]
 	ResetAnimation: (self: Gif)->any,
+
+	--[[
+		Destroy gif
+	]]
 	Destroy: (self: Gif)->any,
+	--[[
+		Preload all images
+	]]
+	Preload: (self: Gif)->any,
+
+	--[[
+		Add image
+	]]
+	AddImage: (self: Gif, image: GifImage)->any,
 
 	--[[
 		Показывает что анимация завершилась
@@ -44,59 +91,95 @@ export type Gif = {
 	ComplitedEvent: BindableEvent
 }
 
-function _Destroy(self: Gif)
+function giflib.Destroy(self: Gif)
 	self.ComplitedEvent:Destroy()
 end
 
-function _Preload(self: Gif)
+function giflib.Preload(self: Gif)
 	ContentProvider:PreloadAsync(algorithm.copy_by_prop(self.Images, "Image"))
+	self.IsLoaded = true
 end
 
-function _StartAnimation(self: Gif)
-	task.spawn(function()
-		self.AnimationRunning = true
-		
-		while not self.AnimationRunning do
-			self.ImageLabel.Image = self.Images[self.Frame].Image
+function giflib.StartAnimation(self: Gif)
 
-			if #self.Images == self.Frame then
+	if not self.IsLoaded then
+		self:Preload()
+	end
+
+	self.AnimationRunning = true
+
+	task.spawn(function()
+		while self.AnimationRunning and #self.Images >= self.Frame do
+			local GifImage = self.Images[self.Frame]
+
+			GifImage.Image.Visible = true
+
+			if #self.Images + 1 <= self.Frame then
 				break
 			else
 				self.Frame += 1
 			end
 			
-			task.wait(self.Images[self.Frame].Time)
+			task.wait(GifImage.Time)
+			GifImage.Image.Visible = false
 		end
+
+		self.AnimationRunning = false
 
 		self.ComplitedEvent:Fire()
 	end)
 end
 
-function _StopAnimation(self: Gif)
+function giflib.StopAnimation(self: Gif)
 	self.AnimationRunning = false
 end
 
-function _ResetAnimation(self: Gif)
+function giflib.ResetAnimation(self: Gif)
 	self.Frame = 1
+	if not self.AnimationRunning then
+		self:StartAnimation()
+	end
 end
 
-function giflib.newGif(imageLabel: ImageLabel, images: {GifImage}, loopAnimation: boolean?): Gif
-	
+function giflib.AddImage(self: Gif, image: GifImage)
+	self.IsLoaded = false
+
+	self.Images[#self.Images + 1] = image
+end
+
+--[[
+	Gif constructor
+
+	`Label` - то на чем отображается гифка
+
+	`images` - list of `GifImage`s
+
+	`loopAnimation` - if true animation is will be looped
+]]
+function giflib.newGif(Label: Frame, images: {GifImage}, loopAnimation: boolean?): Gif
+
 	local _ComplitedEvent = Instance.new("BindableEvent")
 
 	local self: Gif = {
-		ImageLabel = imageLabel,
+		ImageLabel = Label,
 		Images = images,
 		Frame = 1,
 		AnimationRunning = false,
 		Complited = _ComplitedEvent.Event,
 		ComplitedEvent = _ComplitedEvent,
 		LoopAnimation = loopAnimation or false,
-		Destroy = _Destroy,
-		StartAnimation = _StartAnimation,
-		StopAnimation = _StopAnimation,
-		ResetAnimation = _ResetAnimation,
+		IsLoaded = false,
+		Destroy = giflib.Destroy,
+		StartAnimation = giflib.StartAnimation,
+		StopAnimation = giflib.StopAnimation,
+		ResetAnimation = giflib.ResetAnimation,
+		Preload = giflib.Preload,
+		AddImage = giflib.AddImage
 	}
+
+	for _, v in pairs(self.Images) do
+		v.Image.Parent = Label
+	end
 
 	self.Complited:Connect(function()
 		if self.LoopAnimation then
@@ -107,6 +190,31 @@ function giflib.newGif(imageLabel: ImageLabel, images: {GifImage}, loopAnimation
 	end)
 
 	return self
+end
+
+--[[
+	Gif image constructor
+
+	you can do not use funct fror creating `GifImage`
+]]
+function giflib.newImage(id: string, t: number): GifImage
+	local function AddProtocolIfINeeded(): string
+		if not id:find("http://www.roblox.com/asset/?id=") then
+			id = "http://www.roblox.com/asset/?id=" .. id
+		end
+
+		return id
+	end
+
+	local img: GifImage = {
+		Image = Instance.new("ImageLabel"),
+		Time = t
+	}
+
+	img.Image.Image = AddProtocolIfINeeded()
+	img.Image.Size = UDim2.fromScale(1, 1)
+
+	return img
 end
 
 

@@ -3,7 +3,7 @@ name = "egor00f/giflib"
 
 description = "Library for creating gifs"
 
-version = "0.1.1"
+version = "0.1.2"
 
 registry = "https://github.com/UpliftGames/wally-index"
 
