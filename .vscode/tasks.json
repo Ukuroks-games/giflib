@@ -1,0 +1,78 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build tests",
+            "detail": "Build tests place",
+            "command": "rojo build tests.project.json --output tests.rbxl && exit",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Install depends"
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "Generate sourcemap for tests",
+            "detail": "Generate sourcemap for tests",
+            "command": "rojo sourcemap tests.project.json --output sourcemap.json && exit",
+            "group": {
+                "kind": "none"
+            },
+            "dependsOn": [
+                "Install depends"
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "Install programms",
+            "detail": "Install programms using aftman",
+            "command": "aftman install && exit",
+            "group": {
+                "kind": "none"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Install depends",
+            "detail": "Install all project depends",
+            "command": "wally install && exit",
+            "group": {
+                "kind": "none"
+            },
+            "problemMatcher": [],
+        },
+        {
+            "type": "shell",
+            "label": "Update depends",
+            "detail": "Update all project depends",
+            "command": "wally update && exit",
+            "group": {
+                "kind": "none"
+            },
+            "problemMatcher": [],
+        },
+        {
+            "type": "shell",
+            "label": "publish",
+            "detail": "publish it as wally package",
+            "command": "wally publish && exit",
+            "group": {
+                "kind": "none"
+            },
+            "problemMatcher": []
+        },
+    ],
+    "options": {
+        "shell": {
+            "executable": "cmd",
+            "args": [
+                "/k"
+            ]
+        }
+    },
+    "version": "2.0.0"
+}

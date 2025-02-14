@@ -1,6 +1,30 @@
 # Giflib
 
-library for creating gifs
+Small library for creating gifs in roblox
+
+
+
+## Functions
+
+`newGif` - gif constructor.
+
+`newImage` - gif image constructor
+
+`StartAnimation` - start gif animation
+
+`StopAnimation` - stopping animation
+
+`ResetAnimation` - Reset animation.
+
+`Preload` - Preload images.
+
+`AddImage` - Adding image existing gif
+
+## Events
+
+`Completed` - Fire on animation is ended. If animation is looped fires on every restarting
+
+`Destroying` - Fire on destroying gif
 
 ## Example
 
@@ -35,4 +59,19 @@ local mygif = giflib.newGif(
 )
 
 mygif:StartAnimation()
+
+
+
+wait(10)
+mygif:StopAnimation()
+
+wait(10)
+mygif:StartAnimation() -- continue 
+
+
+
+wait(10)
+
+mygif:Destroy()
+
 ```

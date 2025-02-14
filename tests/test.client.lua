@@ -28,3 +28,19 @@ local mygif = giflib.newGif(
 )
 
 mygif:StartAnimation()
+
+
+
+
+wait(10)
+mygif:StopAnimation()
+
+wait(10)
+mygif:StartAnimation() -- continue 
+
+
+
+
+wait(10)
+
+mygif:Destroy()
