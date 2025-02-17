@@ -1,19 +1,21 @@
+-- Services 
+
 local ContentProvider = game:GetService("ContentProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+-- Libraries
+
 local algorithm = require(ReplicatedStorage.Packages.stdlib).algorithm
 
+local Frame = require(script.Parent.gifFrame)
+
+--[[
+	# Library for creating gifs
+]]
 local giflib = {}
 
-export type GifImage = {
+giflib.Frame = Frame
 
-	Image: ImageLabel,
-
-	--[[
-		delay on this image
-	]]
-	Time: number
-}
 
 --[[
 	Gif struct
@@ -22,9 +24,9 @@ export type Gif = {
 	--[[
 		Список кадров в гифке
 	]]
-	Images: 
+	Frames: 
 	{
-		GifImage
+		Frame.GifFrame
 	},
 
 	--[[
@@ -57,32 +59,38 @@ export type Gif = {
 	--[[
 		Start Gif animation
 	]]
-	StartAnimation: (self: Gif)->any,
+	StartAnimation: (self: Gif)->nil,
 
 	--[[
 		Stop gif animation
 	]]
-	StopAnimation: (self: Gif)->any,
+	StopAnimation: (self: Gif)->nil,
 
 	--[[
 		Reset animation.
 		if animation runnning now, run gif from first image
 	]]
-	ResetAnimation: (self: Gif)->any,
+	ResetAnimation: (self: Gif)->nil,
 
 	--[[
 		Destroy gif
 	]]
 	Destroy: (self: Gif)->nil,
+
 	--[[
-		Preload all images
+		Wait all image loading
 	]]
 	Preload: (self: Gif)->nil,
 
 	--[[
-		Add image
+		Add frame to gif
 	]]
-	AddImage: (self: Gif, image: GifImage)->nil,
+	AddImage: (self: Gif, image: Frame.GifFrame)->nil,
+
+	--[[
+		Set current frame
+	]]
+	SetFrame: (self: Gif, frame: number)->nil,
 
 	--[[
 		Показывает что анимация завершилась
@@ -90,57 +98,78 @@ export type Gif = {
 	Completed: RBXScriptSignal,
 	CompletedEvent: BindableEvent,
 
+	--[[
+		Fire if gif destroying(Destroy called)
+	]]
 	Destroying: RBXScriptConnection,
 	DestroyingEvent: BindableEvent,
 
-	AnimationThread: thread
+	--[[
+		Thread int that gif animation runnging
+	]]
+	AnimationThread: thread,
 }
 
+--[[
+	Destroy gif
+]]
 function giflib.Destroy(self: Gif)
 	
 	-- Если анимация всё ещё запущенна
-	if self.AnimationRunning then
-		task.cancel(self.AnimationThread)
-	end
+	self:StopAnimation()
 
 	self.DestroyingEvent:Fire()
 
-	for _, v in pairs(self.Images) do
+	-- Destroy frames
+	for _, v in pairs(self.Frames) do
 		if v then
-			v.Image:Destroy()
+			Frame.Destroy(v)
 		end
 	end
 
-	table.clear(self)
+	self.CompletedEvent:Destroy()
+	self.DestroyingEvent:Destroy()
+
+	table.remove(self)
 end
 
+--[[
+	Wait all image loading
+]]
 function giflib.Preload(self: Gif)
-	ContentProvider:PreloadAsync(algorithm.copy_by_prop(self.Images, "Image"))
+
+	ContentProvider:PreloadAsync(algorithm.copy_by_prop(self.Frames, "Image.Image"))
+
+	for _, v in pairs(self.Frames) do
+		Frame.WaitLoading(v)
+	end
+
 	self.IsLoaded = true
 end
 
 function giflib.StartAnimation(self: Gif)
 
+	self.AnimationRunning = true
+
 	if not self.IsLoaded then
 		self:Preload()
 	end
 
-	self.AnimationRunning = true
-
 	self.AnimationThread = task.spawn(function()
-		while self.AnimationRunning and #self.Images >= self.Frame do
-			local GifImage = self.Images[self.Frame]
 
-			GifImage.Image.Visible = true
+		while #self.Frames >= self.Frame do
 
-			if #self.Images + 1 <= self.Frame then
+			giflib.SetFrame(self, self.Frame)
+
+			local t = self.Frames[self.Frame].Time
+
+			if #self.Frames + 1 <= self.Frame then
 				break
 			else
 				self.Frame += 1
 			end
 			
-			task.wait(GifImage.Time)
-			GifImage.Image.Visible = false
+			task.wait(t)
 		end
 
 		self.AnimationRunning = false
@@ -150,9 +179,27 @@ function giflib.StartAnimation(self: Gif)
 end
 
 function giflib.StopAnimation(self: Gif)
+	if self.AnimationRunning then
+		task.cancel(self.AnimationThread)
+	end
+
 	self.AnimationRunning = false
 end
 
+function giflib.SetFrame(self: Gif, frame: number)
+	self.Frame = frame
+
+	Frame.Show(self.Frames[self.Frame], self.ImageLabel)
+
+	if self.Frame > 1 then
+		Frame.Hide(self.Frames[self.Frame - 1])
+	end
+end
+
+--[[
+	Reset animation.
+	if animation runnning now, run gif from first image
+]]
 function giflib.ResetAnimation(self: Gif)
 	self.Frame = 1
 	if not self.AnimationRunning then
@@ -160,10 +207,10 @@ function giflib.ResetAnimation(self: Gif)
 	end
 end
 
-function giflib.AddImage(self: Gif, image: GifImage)
+function giflib.AddImage(self: Gif, image: Frame.GifFrame)
 	self.IsLoaded = false
 
-	self.Images[#self.Images + 1] = image
+	self.Frames[#self.Frames + 1] = image
 end
 
 --[[
@@ -175,14 +222,14 @@ end
 
 	`loopAnimation` - if true animation is will be looped
 ]]
-function giflib.newGif(Label: Frame, images: {GifImage}, loopAnimation: boolean?): Gif
+function giflib.newGif(Label: Frame, images: {Frame.GifFrame}, loopAnimation: boolean?): Gif
 
 	local _ComplitedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
 
 	local self: Gif = {
 		ImageLabel = Label,
-		Images = images,
+		Frames = images,
 		Frame = 1,
 		AnimationRunning = false,
 		Completed = _ComplitedEvent.Event,
@@ -197,13 +244,11 @@ function giflib.newGif(Label: Frame, images: {GifImage}, loopAnimation: boolean?
 		ResetAnimation = giflib.ResetAnimation,
 		Preload = giflib.Preload,
 		AddImage = giflib.AddImage,
-		AnimationThread = nil,
-		__len = function(self: Gif)
-			return #self.Images
-		end
+		SetFrame = giflib.SetFrame,
+		AnimationThread = nil
 	}
 
-	for _, v in pairs(self.Images) do
+	for _, v in pairs(self.Frames) do
 		v.Image.Parent = Label
 	end
 
@@ -217,31 +262,5 @@ function giflib.newGif(Label: Frame, images: {GifImage}, loopAnimation: boolean?
 
 	return self
 end
-
---[[
-	Gif image constructor
-
-	you can do not use funct fror creating `GifImage`
-]]
-function giflib.newImage(id: string, t: number): GifImage
-	local function AddProtocolIfINeeded(): string
-		if not id:find("http://www.roblox.com/asset/?id=") then
-			id = "http://www.roblox.com/asset/?id=" .. id
-		end
-
-		return id
-	end
-
-	local img: GifImage = {
-		Image = Instance.new("ImageLabel"),
-		Time = t
-	}
-
-	img.Image.Image = AddProtocolIfINeeded()
-	img.Image.Size = UDim2.fromScale(1, 1)
-
-	return img
-end
-
 
 return giflib

@@ -2,7 +2,7 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "Build tests",
+            "label": "Build",
             "detail": "Build tests place",
             "command": "rojo build tests.project.json --output tests.rbxl && exit",
             "group": {
@@ -15,8 +15,8 @@
         },
         {
             "type": "shell",
-            "label": "Generate sourcemap for tests",
-            "detail": "Generate sourcemap for tests",
+            "label": "Generate sourcemap",
+            "detail": "Generate sourcemap",
             "command": "rojo sourcemap tests.project.json --output sourcemap.json && exit",
             "group": {
                 "kind": "none"
@@ -57,8 +57,8 @@
         },
         {
             "type": "shell",
-            "label": "publish",
-            "detail": "publish it as wally package",
+            "label": "Publish",
+            "detail": "Publish this as wally package",
             "command": "wally publish && exit",
             "group": {
                 "kind": "none"
@@ -66,13 +66,15 @@
             "problemMatcher": []
         },
     ],
-    "options": {
-        "shell": {
-            "executable": "cmd",
-            "args": [
-                "/k"
-            ]
-        }
+    "windows": {
+        "options": {
+           "shell": {
+                "executable": "cmd",
+                "args": [
+                    "/k"
+                ]
+            }
+        },  
     },
     "version": "2.0.0"
 }

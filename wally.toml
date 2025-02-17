@@ -23,7 +23,7 @@ include = ["src", "src/**", "wally.toml", "README.md", "init.lua"]
 private = false
 
 [dependencies]
-stdlib = "egor00f/stdlib@0.1.5"
+stdlib = "egor00f/stdlib@0.1.6"
 
 [server-dependencies]
 
