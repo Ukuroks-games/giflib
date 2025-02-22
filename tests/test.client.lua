@@ -8,7 +8,7 @@ local imageLabel = Instance.new("Frame")
 imageLabel.Parent = Players.LocalPlayer.PlayerGui:WaitForChild("ScreenGui")
 imageLabel.Size = UDim2.fromScale(1, 1)
 
-local mygif = giflib.newGif(
+local mygif = giflib.new(
 	imageLabel,
 	{
 		giflib.Frame.new("85510906103514", 0.08),

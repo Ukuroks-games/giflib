@@ -24,10 +24,7 @@ export type Gif = {
 	--[[
 		Список кадров в гифке
 	]]
-	Frames: 
-	{
-		Frame.GifFrame
-	},
+	Frames: { Frame.GifFrame },
 
 	--[[
 		Gif surface
@@ -59,49 +56,56 @@ export type Gif = {
 	--[[
 		Start Gif animation
 	]]
-	StartAnimation: (self: Gif)->nil,
+	StartAnimation: (self: Gif) -> nil,
 
 	--[[
 		Stop gif animation
 	]]
-	StopAnimation: (self: Gif)->nil,
+	StopAnimation: (self: Gif) -> nil,
 
 	--[[
 		Reset animation.
 		if animation runnning now, run gif from first image
 	]]
-	ResetAnimation: (self: Gif)->nil,
+	ResetAnimation: (self: Gif) -> nil,
 
 	--[[
 		Destroy gif
 	]]
-	Destroy: (self: Gif)->nil,
+	Destroy: (self: Gif) -> nil,
 
 	--[[
 		Wait all image loading
 	]]
-	Preload: (self: Gif)->nil,
+	Preload: (self: Gif) -> nil,
 
 	--[[
 		Add frame to gif
 	]]
-	AddImage: (self: Gif, image: Frame.GifFrame)->nil,
+	AddImage: (self: Gif, image: Frame.GifFrame) -> nil,
 
 	--[[
 		Set current frame
 	]]
-	SetFrame: (self: Gif, frame: number)->nil,
+	SetFrame: (self: Gif, frame: number) -> nil,
+
+	--[[
+		Next frame
+	]]
+	Next: (self: Gif) -> nil,
 
 	--[[
 		Показывает что анимация завершилась
 	]]
 	Completed: RBXScriptSignal,
+
 	CompletedEvent: BindableEvent,
 
 	--[[
 		Fire if gif destroying(Destroy called)
 	]]
 	Destroying: RBXScriptConnection,
+	
 	DestroyingEvent: BindableEvent,
 
 	--[[
@@ -207,10 +211,11 @@ function giflib.ResetAnimation(self: Gif)
 	end
 end
 
-function giflib.AddImage(self: Gif, image: Frame.GifFrame)
-	self.IsLoaded = false
-
-	self.Frames[#self.Frames + 1] = image
+--[[
+	Next frame
+]]
+function giflib.Next(self: Gif)
+	self:SetFrame(self.Frame + 1)
 end
 
 --[[
@@ -222,7 +227,7 @@ end
 
 	`loopAnimation` - if true animation is will be looped
 ]]
-function giflib.newGif(Label: Frame, images: {Frame.GifFrame}, loopAnimation: boolean?): Gif
+function giflib.new(Label: Frame, images: { Frame.GifFrame }, loopAnimation: boolean?): Gif
 
 	local _ComplitedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
@@ -238,6 +243,7 @@ function giflib.newGif(Label: Frame, images: {Frame.GifFrame}, loopAnimation: bo
 		DestroyingEvent = _DestroyingEvent,
 		LoopAnimation = loopAnimation or false,
 		IsLoaded = false,
+		AnimationThread = nil,
 		Destroy = giflib.Destroy,
 		StartAnimation = giflib.StartAnimation,
 		StopAnimation = giflib.StopAnimation,
@@ -245,7 +251,7 @@ function giflib.newGif(Label: Frame, images: {Frame.GifFrame}, loopAnimation: bo
 		Preload = giflib.Preload,
 		AddImage = giflib.AddImage,
 		SetFrame = giflib.SetFrame,
-		AnimationThread = nil
+		Next = giflib.Next
 	}
 
 	for _, v in pairs(self.Frames) do

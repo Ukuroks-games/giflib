@@ -3,7 +3,7 @@ name = "egor00f/giflib"
 
 description = "Library for creating gifs"
 
-version = "0.1.4"
+version = "0.1.5"
 
 registry = "https://github.com/UpliftGames/wally-index"
 
@@ -23,7 +23,7 @@ include = ["src", "src/**", "wally.toml", "README.md", "init.lua"]
 private = false
 
 [dependencies]
-stdlib = "egor00f/stdlib@0.1.6"
+stdlib = "egor00f/stdlib@0.1.8"
 
 [server-dependencies]
 

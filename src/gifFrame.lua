@@ -58,11 +58,19 @@ function gifFrame.Destroy(self: GifFrame)
 	self.Image:Destroy()
 end
 
+--[[
+	Show frame.
+
+	`parent` is Gif.ImageLabel
+]]
 function gifFrame.Show(self: GifFrame, parent: Frame)
 	self.Image.Position = UDim2.fromScale(0, 0)
 	self.Image.Parent = parent
 end
 
+--[[
+	Hide frame
+]]
 function gifFrame.Hide(self: GifFrame)
 	self.Image.Position = UDim2.fromScale(1, 1)
 	self.Image.Parent = Gui

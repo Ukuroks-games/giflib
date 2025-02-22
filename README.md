@@ -4,19 +4,40 @@ Small library for creating gifs in roblox
 
 
 
+
 ## Functions
 
-`new` - gif constructor.
+### Gif functions
 
-`StartAnimation` - start gif animation
+`new(Label: Frame, images: { Frame.GifFrame }, loopAnimation: boolean?): Gif` - gif constructor.
 
-`StopAnimation` - stopping animation
+`StartAnimation(self: Gif)` - start gif animation
 
-`ResetAnimation` - Reset animation.
+`StopAnimation(self: Gif)` - stop animation
 
-`Preload` - Preload images.
+`ResetAnimation(self: Gif)` - Reset animation.
 
-`AddImage` - Adding image existing gif
+`Preload(self: Gif)` - Preload images. Waiting while images not loading
+
+`SetFrame(self: Gif, frame: number)` - set current frame
+
+`Next(self: Gif)` - Next frame
+
+`Destroy(self: Gif)` - Destroy gif. Destroying table, events and frames. Fire Destroying event
+
+### Frame functions
+
+Gif frame struct not contain this methods,but  you can call them as `giflib.Frame.<method>(Frame, ...)`. Why? I think it's waste of memory.
+
+`new(id: string, t: number): GifFrame` - Frame constructor
+
+`Show(self: GifFrame, parent: Frame)` - Show frame. `parent` is Gif.ImageLabel
+
+`WaitLoading(self: GifFrame)` - Wait while frame is loading
+
+`Hide(self: GifFrame)`- Hide gif frame
+
+`Destroy(self: GifFrame)` - Destroy gif frame
 
 ## Events
 
