@@ -19,7 +19,7 @@ Small library for creating gifs in roblox
 
 `Preload(self: Gif)` - Preload images. Waiting while images not loading
 
-`SetFrame(self: Gif, frame: number)` - set current frame
+`SetFrame(self: Gif, frame: number)` - set current frame, that showing now
 
 `Next(self: Gif)` - Next frame
 

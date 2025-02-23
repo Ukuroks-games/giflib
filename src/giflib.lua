@@ -80,12 +80,7 @@ export type Gif = {
 	Preload: (self: Gif) -> nil,
 
 	--[[
-		Add frame to gif
-	]]
-	AddImage: (self: Gif, image: Frame.GifFrame) -> nil,
-
-	--[[
-		Set current frame
+		Set current frame, that showing now
 	]]
 	SetFrame: (self: Gif, frame: number) -> nil,
 
@@ -161,19 +156,11 @@ function giflib.StartAnimation(self: Gif)
 
 	self.AnimationThread = task.spawn(function()
 
-		while #self.Frames >= self.Frame do
+		while (#self.Frames > self.Frame) and (#self.Frames ~= 0) do
 
-			giflib.SetFrame(self, self.Frame)
-
-			local t = self.Frames[self.Frame].Time
-
-			if #self.Frames + 1 <= self.Frame then
-				break
-			else
-				self.Frame += 1
-			end
+			self:Next()
 			
-			task.wait(t)
+			task.wait(self.Frames[self.Frame].Time)
 		end
 
 		self.AnimationRunning = false
@@ -183,21 +170,25 @@ function giflib.StartAnimation(self: Gif)
 end
 
 function giflib.StopAnimation(self: Gif)
-	if self.AnimationRunning then
+	if self.AnimationRunning and self.AnimationThread then
 		task.cancel(self.AnimationThread)
+		self.AnimationThread = nil
 	end
 
 	self.AnimationRunning = false
 end
 
+--[[
+	Set current frame, that showing now
+]]
 function giflib.SetFrame(self: Gif, frame: number)
-	self.Frame = frame
+	Frame.Show(self.Frames[frame], self.ImageLabel)
 
-	Frame.Show(self.Frames[self.Frame], self.ImageLabel)
-
-	if self.Frame > 1 then
-		Frame.Hide(self.Frames[self.Frame - 1])
+	if self.Frame ~= 0 then
+		Frame.Hide(self.Frames[self.Frame])	-- hide last frame
 	end
+
+	self.Frame = frame
 end
 
 --[[
@@ -205,7 +196,7 @@ end
 	if animation runnning now, run gif from first image
 ]]
 function giflib.ResetAnimation(self: Gif)
-	self.Frame = 1
+	self.Frame = 0
 	if not self.AnimationRunning then
 		self:StartAnimation()
 	end
@@ -235,7 +226,7 @@ function giflib.new(Label: Frame, images: { Frame.GifFrame }, loopAnimation: boo
 	local self: Gif = {
 		ImageLabel = Label,
 		Frames = images,
-		Frame = 1,
+		Frame = 0,
 		AnimationRunning = false,
 		Completed = _ComplitedEvent.Event,
 		CompletedEvent = _ComplitedEvent,
@@ -249,7 +240,6 @@ function giflib.new(Label: Frame, images: { Frame.GifFrame }, loopAnimation: boo
 		StopAnimation = giflib.StopAnimation,
 		ResetAnimation = giflib.ResetAnimation,
 		Preload = giflib.Preload,
-		AddImage = giflib.AddImage,
 		SetFrame = giflib.SetFrame,
 		Next = giflib.Next
 	}
