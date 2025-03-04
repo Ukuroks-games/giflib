@@ -6,10 +6,10 @@
 	"cSpell.words": [
 		"Roblox",
 		"rojo",
+		"Giflib"
 	],
 
 	"cSpell.ignorePaths": [
-		"vscode-extension",
 		".git/objects",
 		".vscode",	// ignore vscode workspace settings
 		".vscode-insiders",

@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local algorithm = require(ReplicatedStorage.Packages.stdlib).algorithm
 
+local gifFrame = require(script.Parent.gifFrame)
 local Frame = require(script.Parent.gifFrame)
 
 --[[
@@ -88,6 +89,8 @@ export type Gif = {
 		Next frame
 	]]
 	Next: (self: Gif) -> nil,
+
+	Hide: (self: Gif) -> nil,
 
 	--[[
 		Показывает что анимация завершилась
@@ -210,6 +213,15 @@ function giflib.Next(self: Gif)
 end
 
 --[[
+	Hide gif frames
+]]
+function giflib.Hide(self: Gif)
+	for _, v in pairs(self.Frames) do
+		gifFrame.Hide(v)
+	end
+end
+
+--[[
 	Gif constructor
 
 	`Label` - то на чем отображается гифка
@@ -241,7 +253,8 @@ function giflib.new(Label: Frame, images: { Frame.GifFrame }, loopAnimation: boo
 		ResetAnimation = giflib.ResetAnimation,
 		Preload = giflib.Preload,
 		SetFrame = giflib.SetFrame,
-		Next = giflib.Next
+		Next = giflib.Next,
+		Hide = giflib.Hide
 	}
 
 	for _, v in pairs(self.Frames) do
