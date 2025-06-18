@@ -3,8 +3,6 @@
 local ContentProvider = game:GetService("ContentProvider")
 local Players = game:GetService("Players")
 
-
-
 --[[
 	Gif frame class
 ]]
@@ -14,13 +12,17 @@ local function CreateGui(name: string)
 	local a = Players.LocalPlayer.PlayerGui:FindFirstChild(name)
 
 	if not a then
-		a = Instance.new("ScreenGui",  Players.LocalPlayer.PlayerGui)
+		a = Instance.new("ScreenGui")
+		a.Parent = Players.LocalPlayer.PlayerGui
 		a.Name = name
 	end
 
-	return a 
+	return a
 end
 
+--[[
+	Gui for preloading a images
+]]
 local Gui = CreateGui("GifPreloadGui")
 
 --[[
@@ -84,14 +86,16 @@ end
 	Gif frame constructor
 ]]
 function gifFrame.new(id: string, t: number): GifFrame
-	
-	if (not id:find("http://www.roblox.com/asset/?id=")) or (not id:find("rbxassetid://")) then
+	if
+		(not id:find("http://www.roblox.com/asset/?id="))
+		or (not id:find("rbxassetid://"))
+	then
 		id = "rbxassetid://" .. id
 	end
 
 	local img: GifFrame = {
 		Image = Instance.new("ImageLabel"),
-		Time = t
+		Time = t,
 	}
 
 	img.Image.Image = id
