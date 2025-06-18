@@ -21,6 +21,9 @@ local function CreateGui(name: string)
 	return a 
 end
 
+--[[
+	Gui for preloading a images
+]]
 local Gui = CreateGui("GifPreloadGui")
 
 --[[
