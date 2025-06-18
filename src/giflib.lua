@@ -132,7 +132,7 @@ function giflib.Destroy(self: Gif)
 	self.CompletedEvent:Destroy()
 	self.DestroyingEvent:Destroy()
 
-	table.remove(self)
+	table.clear(self)
 end
 
 --[[

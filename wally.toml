@@ -16,14 +16,10 @@ repository = "https://github.com/Ukuroks-games/giflib"
 
 authors = ["Egor00f <velikiydolbayeb@gmail.com>"]
 
-exclude = ["*"]
-
-include = ["src", "src/**", "wally.toml", "README.md", "init.lua"]
-
 private = false
 
 [dependencies]
-stdlib = "egor00f/stdlib@0.1.8"
+stdlib = "egor00f/stdlib@>=0.1.8"
 
 [server-dependencies]
 
