@@ -13,3 +13,6 @@ sourcemap.json
 Packages/
 DevPackages/
 ServerPackages/
+
+build/
+giflib.zip
