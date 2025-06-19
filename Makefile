@@ -25,8 +25,11 @@ lint:
 ./Packages: wally.toml
 	wally install
 
+$(LIBNAME).rbxm: configure
+	rojo build library.project.json --output $@
+
 tests: ./Packages
 	rojo build tests.project.json --output tests.rbxl
 
 clean: 
-	$(RM) build $(PACKAGE_NAME)
+	$(RM) build $(PACKAGE_NAME) $(LIBNAME).rbxm
