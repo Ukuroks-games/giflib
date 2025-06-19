@@ -4,26 +4,20 @@
             "type": "shell",
             "label": "Build",
             "detail": "Build tests place",
-            "command": "rojo build tests.project.json --output tests.rbxl && exit",
+            "command": "make tests && exit",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "dependsOn": [
-                "Install depends"
-            ]
+            }
         },
         {
             "type": "shell",
             "label": "Generate sourcemap",
             "detail": "Generate sourcemap",
-            "command": "rojo sourcemap tests.project.json --output sourcemap.json && exit",
+            "command": "make sourcemap && exit",
             "group": {
                 "kind": "none"
             },
-            "dependsOn": [
-                "Install depends"
-            ]
         },
         {
             "type": "shell",
@@ -39,7 +33,7 @@
             "type": "shell",
             "label": "Install depends",
             "detail": "Install all project depends",
-            "command": "wally install && exit",
+            "command": "make ./Package && exit",
             "group": {
                 "kind": "none"
             },
@@ -59,7 +53,7 @@
             "type": "shell",
             "label": "Publish",
             "detail": "Publish this as wally package",
-            "command": "wally publish && exit",
+            "command": "make publish && exit",
             "group": {
                 "kind": "none"
             },

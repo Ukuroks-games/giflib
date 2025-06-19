@@ -31,5 +31,17 @@ $(LIBNAME).rbxm: configure
 tests: ./Packages
 	rojo build tests.project.json --output tests.rbxl
 
-clean: 
+tests.rbxl: tests
+
+sourcemap.json: ./Packages
+	rojo sourcemap tests.project.json --output $@
+
+delete-sourcemap: 
+	$(RM) sourcemap.json
+
+# Re gen sourcemap
+sourcemap: delete-sourcemap sourcemap.json
+
+
+clean:
 	$(RM) build $(PACKAGE_NAME) $(LIBNAME).rbxm
