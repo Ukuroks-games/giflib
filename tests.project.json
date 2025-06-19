@@ -5,7 +5,10 @@
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",
 			"shared": {
-				"$path": "src"
+				"$className": "Folder",
+				"giflib": {
+					"$path": "src"
+				}
 			},
 			"Packages": {
 				"$path": "Packages"
