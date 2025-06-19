@@ -8,14 +8,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local algorithm = require(ReplicatedStorage.Packages.stdlib).algorithm
 
 local gifFrame = require(script.Parent.gifFrame)
-local Frame = require(script.Parent.gifFrame)
 
 --[[
 	# Library for creating gifs
 ]]
 local giflib = {}
-
-giflib.Frame = Frame
 
 --[[
 	Gif struct
@@ -24,7 +21,7 @@ export type Gif = {
 	--[[
 		Список кадров в гифке
 	]]
-	Frames: { Frame.GifFrame },
+	Frames: { gifFrame.GifFrame },
 
 	--[[
 		Gif surface
@@ -153,7 +150,7 @@ function giflib.Destroy(self: Gif)
 	-- Destroy frames
 	for _, v in pairs(self.Frames) do
 		if v then
-			Frame.Destroy(v)
+			gifFrame.Destroy(v)
 		end
 	end
 
@@ -172,7 +169,7 @@ function giflib.Preload(self: Gif)
 	)
 
 	for _, v in pairs(self.Frames) do
-		Frame.WaitLoading(v)
+		gifFrame.WaitLoading(v)
 	end
 
 	self.IsLoaded = true
@@ -211,10 +208,10 @@ end
 	Set current frame, that showing now
 ]]
 function giflib.SetFrame(self: Gif, frame: number)
-	Frame.Show(self.Frames[frame], self.ImageLabel)
+	gifFrame.Show(self.Frames[frame], self.ImageLabel)
 
 	if self.Frame ~= 0 then
-		Frame.Hide(self.Frames[self.Frame]) -- hide last frame
+		gifFrame.Hide(self.Frames[self.Frame]) -- hide last frame
 	end
 
 	self.Frame = frame
@@ -294,7 +291,7 @@ end
 ]]
 function giflib.new(
 	Label: Frame,
-	images: { Frame.GifFrame },
+	images: { gifFrame.GifFrame },
 	loopAnimation: boolean?
 ): Gif
 	local _ComplitedEvent = Instance.new("BindableEvent")

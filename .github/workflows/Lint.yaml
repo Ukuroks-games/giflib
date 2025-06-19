@@ -21,6 +21,6 @@ jobs:
         uses: ok-nick/setup-aftman@v0.4.2
 
       - name: Lint
-        run: selene src/
+        run: make lint
     
   
