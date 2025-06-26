@@ -9,7 +9,6 @@ imageLabel.Parent = Players.LocalPlayer.PlayerGui:WaitForChild("ScreenGui")
 imageLabel.Size = UDim2.fromScale(1, 1)
 
 local mygif = giflib.gif.new(
-	imageLabel,
 	{
 		giflib.Frame.new("85510906103514", 0.08),
 		giflib.Frame.new("108084812514916", 0.08),
@@ -24,6 +23,7 @@ local mygif = giflib.gif.new(
 		giflib.Frame.new("126380322008457", 0.08),
 		giflib.Frame.new("73999504428848", 1),
 	},
+	imageLabel,
 	true -- animation is looped
 )
 

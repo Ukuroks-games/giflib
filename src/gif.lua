@@ -12,7 +12,7 @@ local gifFrame = require(script.Parent.gifFrame)
 --[[
 	# Library for creating gifs
 ]]
-local giflib = {}
+local gif = {}
 
 --[[
 	Gif struct
@@ -26,7 +26,7 @@ export type Gif = {
 	--[[
 		Gif surface
 	]]
-	ImageLabel: Frame,
+	Parent: Frame,
 
 	--[[
 		Current frame num
@@ -77,41 +77,6 @@ export type Gif = {
 	Preload: (self: Gif) -> nil,
 
 	--[[
-		Set current frame, that showing now
-	]]
-	SetFrame: (self: Gif, frame: number) -> nil,
-
-	--[[
-		Next frame
-	]]
-	Next: (self: Gif) -> nil,
-
-	--[[
-	
-	]]
-	Hide: (self: Gif) -> nil,
-
-	--[[
-	
-	]]
-	SetTransparency: (self: Gif, newTransparency: number) -> nil,
-
-	--[[
-	
-	]]
-	SetBackgroundTransparency: (self: Gif, newTransparency: number) -> nil,
-
-	--[[
-	
-	]]
-	SetBackgroundColor: (self: Gif, newColor: Color3) -> nil,
-
-	--[[
-	
-	]]
-	SetScaleType: (self: Gif, scaleType: Enum.ScaleType) -> nil,
-
-	--[[
 		Показывает что анимация завершилась
 	]]
 	Completed: RBXScriptSignal,
@@ -136,12 +101,12 @@ export type Gif = {
 		Thread int that gif animation runnging
 	]]
 	AnimationThread: thread,
-}
+} & typeof(gif)
 
 --[[
 	Destroy gif
 ]]
-function giflib.Destroy(self: Gif)
+function gif.Destroy(self: Gif)
 	-- Если анимация всё ещё запущенна
 	self:StopAnimation()
 
@@ -163,7 +128,7 @@ end
 --[[
 	Wait all image loading
 ]]
-function giflib.Preload(self: Gif)
+function gif.Preload(self: Gif)
 	ContentProvider:PreloadAsync(
 		algorithm.copy_by_prop(self.Frames, "Image.Image")
 	)
@@ -175,7 +140,10 @@ function giflib.Preload(self: Gif)
 	self.IsLoaded = true
 end
 
-function giflib.StartAnimation(self: Gif)
+--[[
+
+]]
+function gif.StartAnimation(self: Gif)
 	self.AnimationRunning = true
 
 	if not self.IsLoaded then
@@ -195,7 +163,10 @@ function giflib.StartAnimation(self: Gif)
 	end)
 end
 
-function giflib.StopAnimation(self: Gif)
+--[[
+
+]]
+function gif.StopAnimation(self: Gif)
 	if self.AnimationRunning and self.AnimationThread then
 		task.cancel(self.AnimationThread)
 		self.AnimationThread = nil
@@ -207,8 +178,8 @@ end
 --[[
 	Set current frame, that showing now
 ]]
-function giflib.SetFrame(self: Gif, frame: number)
-	gifFrame.Show(self.Frames[frame], self.ImageLabel)
+function gif.SetFrame(self: Gif, frame: number)
+	gifFrame.Show(self.Frames[frame], self.Parent)
 
 	if self.Frame ~= 0 then
 		gifFrame.Hide(self.Frames[self.Frame]) -- hide last frame
@@ -221,7 +192,7 @@ end
 	Reset animation.
 	if animation runnning now, run gif from first image
 ]]
-function giflib.ResetAnimation(self: Gif)
+function gif.ResetAnimation(self: Gif)
 	self.Frame = 0
 	if not self.AnimationRunning then
 		self:StartAnimation()
@@ -231,32 +202,32 @@ end
 --[[
 	Next frame
 ]]
-function giflib.Next(self: Gif)
+function gif.Next(self: Gif)
 	self:SetFrame(self.Frame + 1)
 end
 
 --[[
 	Hide gif frames
 ]]
-function giflib.Hide(self: Gif)
+function gif.Hide(self: Gif)
 	for _, v in pairs(self.Frames) do
 		gifFrame.Hide(v)
 	end
 end
 
 --[[
-
+	Set frames background transparency
 ]]
-function giflib.SetBackgroundTransparency(self: Gif, newTransparency: number)
+function gif.SetBackgroundTransparency(self: Gif, newTransparency: number)
 	for _, v in pairs(self.Frames) do
 		v.Image.BackgroundTransparency = newTransparency
 	end
 end
 
 --[[
-
+	Set frames background color
 ]]
-function giflib.SetBackgroundColor(self: Gif, newColor: Color3)
+function gif.SetBackgroundColor(self: Gif, newColor: Color3)
 	for _, v in pairs(self.Frames) do
 		v.Image.BackgroundColor3 = newColor
 	end
@@ -265,7 +236,7 @@ end
 --[[
 
 ]]
-function giflib.SetTransparency(self: Gif, newTransparency: number)
+function gif.SetTransparency(self: Gif, newTransparency: number)
 	for _, v in pairs(self.Frames) do
 		v.Image.ImageTransparency = newTransparency
 	end
@@ -274,9 +245,15 @@ end
 --[[
 
 ]]
-function giflib.SetScaleType(self: Gif, scaleType: Enum.ScaleType)
+function gif.SetScaleType(self: Gif, scaleType: Enum.ScaleType)
 	for _, v in pairs(self.Frames) do
 		v.Image.ScaleType = scaleType
+	end
+end
+
+function gif.SetParent(self, newParent: Frame?)
+	for _, v in pairs(self.Frames) do
+		v.Image.Parent = newParent
 	end
 end
 
@@ -289,17 +266,17 @@ end
 
 	`loopAnimation` - if true animation is will be looped
 ]]
-function giflib.new(
-	Label: Frame,
-	images: { gifFrame.GifFrame },
+function gif.new(
+	frames: { gifFrame.GifFrame },
+	parent: Frame?,
 	loopAnimation: boolean?
 ): Gif
 	local _ComplitedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
 
-	local self: Gif = {
-		ImageLabel = Label,
-		Frames = images,
+	local self = {
+		Parent = parent,
+		Frames = frames,
 		Frame = 0,
 		AnimationRunning = false,
 		Completed = _ComplitedEvent.Event,
@@ -309,23 +286,9 @@ function giflib.new(
 		LoopAnimation = loopAnimation or false,
 		IsLoaded = false,
 		AnimationThread = nil,
-		Destroy = giflib.Destroy,
-		SetTransparency = giflib.SetTransparency,
-		SetBackgroundTransparency = giflib.SetBackgroundTransparency,
-		SetBackgroundColor = giflib.SetBackgroundColor,
-		StartAnimation = giflib.StartAnimation,
-		StopAnimation = giflib.StopAnimation,
-		ResetAnimation = giflib.ResetAnimation,
-		SetScaleType = giflib.SetScaleType,
-		Preload = giflib.Preload,
-		SetFrame = giflib.SetFrame,
-		Next = giflib.Next,
-		Hide = giflib.Hide,
 	}
 
-	for _, v in pairs(self.Frames) do
-		v.Image.Parent = Label
-	end
+	setmetatable(self, { __index = gif })
 
 	self.Completed:Connect(function()
 		if self.LoopAnimation then
@@ -338,4 +301,4 @@ function giflib.new(
 	return self
 end
 
-return giflib
+return gif

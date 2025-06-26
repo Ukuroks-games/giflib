@@ -26,6 +26,7 @@ lint:
 	wally install
 
 $(LIBNAME).rbxm: configure
+	$(MV) build/init.lua build/$(LIBNAME).lua
 	rojo build library.project.json --output $@
 
 tests: ./Packages
