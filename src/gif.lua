@@ -288,7 +288,7 @@ function gif.new(
 
 	gif.Hide(self)
 
-	if ShowFirstFrameBeforeLoading == true then
+	if ShowFirstFrameBeforeStart == true then
 		if parent ~= nil then
 			gif.Next(self)
 		else
