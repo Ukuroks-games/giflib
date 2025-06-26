@@ -51,6 +51,26 @@
         },
         {
             "type": "shell",
+            "label": "Build rbxm",
+            "detail": "Build rbxm library",
+            "command": "make 2d-adventurelib.rbxm && exit",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Clean",
+            "detail": "Clean builded",
+            "command": "make clean && exit",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "type": "shell",
             "label": "Publish",
             "detail": "Publish this as wally package",
             "command": "make publish && exit",
