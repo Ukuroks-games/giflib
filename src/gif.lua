@@ -106,26 +106,28 @@ end
 --[[
 	Wait all image loading
 ]]
-function gif.Preload(self: GifStruct)
+function gif.Preload(self: GifStruct, noWaitLoad: boolean?)
 	ContentProvider:PreloadAsync(
 		algorithm.copy_by_prop(self.Frames, "Image.Image")
 	)
 
-	for _, v in pairs(self.Frames) do
-		gifFrame.WaitLoading(v)
+	if noWaitLoad == true then
+		for _, v in pairs(self.Frames) do
+			gifFrame.WaitLoading(v)
+		end
 	end
 
 	self.IsLoaded = true
 end
 
 --[[
-
+	Start gif animation
 ]]
-function gif.StartAnimation(self: GifStruct)
+function gif.StartAnimation(self: GifStruct, noWaitLoad: boolean?)
 	self.AnimationRunning = true
 
 	if not self.IsLoaded then
-		gif.Preload(self)
+		gif.Preload(self, noWaitLoad)
 	end
 
 	self.AnimationThread = task.spawn(function()
@@ -142,7 +144,7 @@ function gif.StartAnimation(self: GifStruct)
 end
 
 --[[
-
+	Stop gif animation
 ]]
 function gif.StopAnimation(self: GifStruct)
 	if self.AnimationRunning and self.AnimationThread then
@@ -214,7 +216,7 @@ function gif.SetBackgroundColor(self: GifStruct, newColor: Color3)
 end
 
 --[[
-
+	Set images transparency
 ]]
 function gif.SetTransparency(self: GifStruct, newTransparency: number)
 	for _, v in pairs(self.Frames) do
@@ -223,7 +225,7 @@ function gif.SetTransparency(self: GifStruct, newTransparency: number)
 end
 
 --[[
-
+	Set scale type
 ]]
 function gif.SetScaleType(self: GifStruct, scaleType: Enum.ScaleType)
 	for _, v in pairs(self.Frames) do
@@ -231,6 +233,15 @@ function gif.SetScaleType(self: GifStruct, scaleType: Enum.ScaleType)
 	end
 end
 
+function gif.SetResampleMode(self: GifStruct, resampleMode: Enum.ResamplerMode)
+	for _, v in pairs(self.Frames) do
+		v.Image.ResampleMode = resampleMode
+	end
+end
+
+--[[
+	Set gif parent
+]]
 function gif.SetParent(self: GifStruct, newParent: Frame?)
 	self.Parent = newParent
 	self.Frames[self.Frame].Image.Parent = newParent

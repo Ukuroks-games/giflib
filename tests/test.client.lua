@@ -28,7 +28,10 @@ local mygif = giflib.gif.new(
 	true
 )
 
-mygif:StartAnimation()
+mygif:SetResampleMode(Enum.ResamplerMode.Pixelated)
+mygif:SetScaleType(Enum.ScaleType.Fit)
+
+mygif:StartAnimation(true) -- without wait loading
 
 wait(10)
 print("Stop Animation")
@@ -36,7 +39,7 @@ mygif:StopAnimation()
 
 wait(10)
 print("Start")
-mygif:StartAnimation() -- continue
+mygif:StartAnimation()
 
 wait(10)
 print("Destroy")
