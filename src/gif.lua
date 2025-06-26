@@ -56,8 +56,7 @@ export type GifStruct = {
 	Completed: RBXScriptSignal,
 
 	--[[
-
-
+		Fire where gif anition comleted
 	]]
 	CompletedEvent: BindableEvent,
 
@@ -67,7 +66,7 @@ export type GifStruct = {
 	Destroying: RBXScriptConnection,
 
 	--[[
-	
+		Fire where Destroy call
 	]]
 	DestroyingEvent: BindableEvent,
 
@@ -77,6 +76,9 @@ export type GifStruct = {
 	AnimationThread: thread,
 }
 
+--[[
+	Gif type
+]]
 export type Gif = GifStruct & typeof(gif)
 
 --[[
@@ -88,7 +90,7 @@ function gif.Destroy(self: GifStruct, notDestroyFrames: boolean?)
 
 	self.DestroyingEvent:Fire()
 
-	if notDestroyFrames then
+	if not notDestroyFrames then
 		-- Destroy frames
 		for _, v in pairs(self.Frames) do
 			if v then
@@ -233,6 +235,9 @@ function gif.SetScaleType(self: GifStruct, scaleType: Enum.ScaleType)
 	end
 end
 
+--[[
+	Set resample mode
+]]
 function gif.SetResampleMode(self: GifStruct, resampleMode: Enum.ResamplerMode)
 	for _, v in pairs(self.Frames) do
 		v.Image.ResampleMode = resampleMode
@@ -250,17 +255,19 @@ end
 --[[
 	Gif constructor
 
+	`images` - list of `GifFrame`s
+
 	`Label` - то на чем отображается гифка
 
-	`images` - list of `GifImage`s
-
 	`loopAnimation` - if true animation is will be looped
+
+	`ShowFirstFrameBeforeLoading` - Show the fisrst frame before animation start
 ]]
 function gif.new(
 	frames: { gifFrame.GifFrame }?,
 	parent: Frame?,
 	loopAnimation: boolean?,
-	ShowFirstFrameBeforeLoading: boolean?
+	ShowFirstFrameBeforeStart: boolean?
 ): Gif
 	local _ComplitedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
