@@ -8,7 +8,7 @@ local Players = game:GetService("Players")
 ]]
 local gifFrame = {}
 
-local function CreateGui(name: string)
+local function CreateGui(name: string): Instance
 	local a = Players.LocalPlayer.PlayerGui:FindFirstChild(name)
 
 	if not a then
@@ -28,7 +28,7 @@ local Gui = CreateGui("GifPreloadGui")
 --[[
 	gifFrame struct
 ]]
-export type GifFrame = {
+export type GifFrameStruct = {
 
 	--[[
 		Label with image
@@ -40,6 +40,8 @@ export type GifFrame = {
 	]]
 	Time: number,
 }
+
+export type GifFrame = GifFrameStruct & typeof(gifFrame)
 
 --[[
 	Preload frame
@@ -93,16 +95,18 @@ function gifFrame.new(id: string, t: number): GifFrame
 		id = "rbxassetid://" .. id
 	end
 
-	local img: GifFrame = {
+	local self: GifFrameStruct = {
 		Image = Instance.new("ImageLabel"),
 		Time = t,
 	}
 
-	img.Image.Image = id
-	img.Image.Size = UDim2.fromScale(1, 1)
-	img.Image.Position = UDim2.fromScale(1, 1)
+	setmetatable(self, { __index = gifFrame })
 
-	return img
+	self.Image.Image = id
+	self.Image.Size = UDim2.fromScale(1, 1)
+	self.Image.Position = UDim2.fromScale(1, 1)
+
+	return self
 end
 
 return gifFrame

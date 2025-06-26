@@ -24,7 +24,8 @@ local mygif = giflib.gif.new(
 		giflib.Frame.new("73999504428848", 1),
 	},
 	imageLabel,
-	true -- animation is looped
+	true, -- animation is looped
+	true
 )
 
 mygif:StartAnimation()
