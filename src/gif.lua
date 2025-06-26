@@ -14,6 +14,11 @@ local gifFrame = require(script.Parent.gifFrame)
 ]]
 local gif = {}
 
+gif.Mode = {
+	Replace = 0,
+	Combine = 1,
+}
+
 --[[
 	Gif struct
 ]]
@@ -74,6 +79,8 @@ export type GifStruct = {
 		Thread int that gif animation runnging
 	]]
 	AnimationThread: thread,
+
+	Mode: number,
 }
 
 --[[
@@ -164,7 +171,7 @@ function gif.SetFrame(self: GifStruct, frame: number)
 	if self.Parent then
 		gifFrame.Show(self.Frames[frame], self.Parent)
 
-		if self.Frame ~= 0 then
+		if self.Frame ~= 0 and self.Mode == gif.Mode.Replace then
 			gifFrame.Hide(self.Frames[self.Frame]) -- hide last frame
 		end
 	end
@@ -178,9 +185,12 @@ end
 ]]
 function gif.ResetAnimation(self: GifStruct)
 	self.Frame = 0
-	if not self.AnimationRunning then
-		gif.StartAnimation(self)
+
+	if self.Mode == gif.Mode.Combine then
+		gif.Hide(self)
 	end
+
+	gif.StartAnimation(self)
 end
 
 --[[
@@ -267,7 +277,8 @@ function gif.new(
 	frames: { gifFrame.GifFrame }?,
 	parent: Frame?,
 	loopAnimation: boolean?,
-	ShowFirstFrameBeforeStart: boolean?
+	ShowFirstFrameBeforeStart: boolean?,
+	mode: number?
 ): Gif
 	local _ComplitedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
@@ -284,6 +295,7 @@ function gif.new(
 		LoopAnimation = loopAnimation or false,
 		IsLoaded = false,
 		AnimationThread = nil,
+		Mode = mode or gif.Mode.Replace,
 	}
 
 	gif.Hide(self)
