@@ -308,6 +308,10 @@ function gif.new(
 		end
 	end
 
+	if mode == gif.Mode.Combine then
+		gif.SetBackgroundTransparency(self, 1)
+	end
+
 	self.Completed:Connect(function()
 		if self.LoopAnimation then
 			gif.ResetAnimation(self)
