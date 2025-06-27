@@ -14,6 +14,11 @@ local gifFrame = require(script.Parent.gifFrame)
 ]]
 local gif = {}
 
+gif.Mode = {
+	Replace = 0,
+	Combine = 1,
+}
+
 --[[
 	Gif struct
 ]]
@@ -74,6 +79,8 @@ export type GifStruct = {
 		Thread int that gif animation runnging
 	]]
 	AnimationThread: thread,
+
+	Mode: number,
 }
 
 --[[
@@ -164,7 +171,7 @@ function gif.SetFrame(self: GifStruct, frame: number)
 	if self.Parent then
 		gifFrame.Show(self.Frames[frame], self.Parent)
 
-		if self.Frame ~= 0 then
+		if self.Frame ~= 0 and self.Mode == gif.Mode.Replace then
 			gifFrame.Hide(self.Frames[self.Frame]) -- hide last frame
 		end
 	end
@@ -178,9 +185,12 @@ end
 ]]
 function gif.ResetAnimation(self: GifStruct)
 	self.Frame = 0
-	if not self.AnimationRunning then
-		gif.StartAnimation(self)
+
+	if self.Mode == gif.Mode.Combine then
+		gif.Hide(self)
 	end
+
+	gif.StartAnimation(self)
 end
 
 --[[
@@ -203,8 +213,12 @@ end
 	Set frames background transparency
 ]]
 function gif.SetBackgroundTransparency(self: GifStruct, newTransparency: number)
-	for _, v in pairs(self.Frames) do
-		v.Image.BackgroundTransparency = newTransparency
+	if self.Mode == gif.Mode.Combine then
+		self.Frames[1].Image.BackgroundTransparency = newTransparency
+	else
+		for _, v in pairs(self.Frames) do
+			v.Image.BackgroundTransparency = newTransparency
+		end
 	end
 end
 
@@ -264,10 +278,11 @@ end
 	`ShowFirstFrameBeforeLoading` - Show the fisrst frame before animation start
 ]]
 function gif.new(
-	frames: { gifFrame.GifFrame }?,
+	frames: { [number]: gifFrame.GifFrame }?,
 	parent: Frame?,
 	loopAnimation: boolean?,
-	ShowFirstFrameBeforeStart: boolean?
+	ShowFirstFrameBeforeStart: boolean?,
+	mode: number?
 ): Gif
 	local _ComplitedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
@@ -284,6 +299,7 @@ function gif.new(
 		LoopAnimation = loopAnimation or false,
 		IsLoaded = false,
 		AnimationThread = nil,
+		Mode = mode or gif.Mode.Replace,
 	}
 
 	gif.Hide(self)
@@ -293,6 +309,12 @@ function gif.new(
 			gif.Next(self)
 		else
 			warn("gif parent is nil. So how show first frame?")
+		end
+	end
+
+	if mode == gif.Mode.Combine then
+		for i = 2, #self.Frames do
+			self.Frames[i].Image.BackgroundTransparency = 1
 		end
 	end
 
