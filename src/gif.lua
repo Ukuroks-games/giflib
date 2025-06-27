@@ -213,8 +213,12 @@ end
 	Set frames background transparency
 ]]
 function gif.SetBackgroundTransparency(self: GifStruct, newTransparency: number)
-	for _, v in pairs(self.Frames) do
-		v.Image.BackgroundTransparency = newTransparency
+	if self.Mode == gif.Mode.Combine then
+		self.Frames[1].Image.BackgroundTransparency = newTransparency
+	else
+		for _, v in pairs(self.Frames) do
+			v.Image.BackgroundTransparency = newTransparency
+		end
 	end
 end
 
@@ -274,7 +278,7 @@ end
 	`ShowFirstFrameBeforeLoading` - Show the fisrst frame before animation start
 ]]
 function gif.new(
-	frames: { gifFrame.GifFrame }?,
+	frames: { [number]: gifFrame.GifFrame }?,
 	parent: Frame?,
 	loopAnimation: boolean?,
 	ShowFirstFrameBeforeStart: boolean?,
@@ -309,7 +313,9 @@ function gif.new(
 	end
 
 	if mode == gif.Mode.Combine then
-		gif.SetBackgroundTransparency(self, 1)
+		for i = 2, #self.Frames do
+			self.Frames[i].Image.BackgroundTransparency = 1
+		end
 	end
 
 	self.Completed:Connect(function()
