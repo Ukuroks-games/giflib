@@ -33,7 +33,7 @@
             "type": "shell",
             "label": "Install depends",
             "detail": "Install all project depends",
-            "command": "make ./Package && exit",
+            "command": "make ./Packages && exit",
             "group": {
                 "kind": "none"
             },

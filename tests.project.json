@@ -4,14 +4,11 @@
 		"$className": "DataModel",
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",
-			"shared": {
-				"$className": "Folder",
+			"Packages": {
+				"$path": "Packages",
 				"giflib": {
 					"$path": "src"
 				}
-			},
-			"Packages": {
-				"$path": "Packages"
 			}
 		},
 		"StarterPlayer": {

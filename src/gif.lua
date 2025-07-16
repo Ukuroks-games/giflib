@@ -61,7 +61,7 @@ export type GifStruct = {
 	Completed: RBXScriptSignal,
 
 	--[[
-		Fire where gif anition comleted
+		Fire where gif animation completed
 	]]
 	CompletedEvent: BindableEvent,
 
@@ -76,7 +76,7 @@ export type GifStruct = {
 	DestroyingEvent: BindableEvent,
 
 	--[[
-		Thread int that gif animation runnging
+		Thread int that gif animation running
 	]]
 	AnimationThread: thread,
 
@@ -92,10 +92,10 @@ export type Gif = GifStruct & typeof(gif)
 	Destroy gif
 ]]
 function gif.Destroy(self: GifStruct, notDestroyFrames: boolean?)
+	self.DestroyingEvent:Fire()
+
 	-- Если анимация всё ещё запущенна
 	gif.StopAnimation(self)
-
-	self.DestroyingEvent:Fire()
 
 	if not notDestroyFrames then
 		-- Destroy frames
@@ -120,7 +120,7 @@ function gif.Preload(self: GifStruct, noWaitLoad: boolean?)
 		algorithm.copy_by_prop(self.Frames, "Image.Image")
 	)
 
-	if noWaitLoad == true then
+	if noWaitLoad ~= true then
 		for _, v in pairs(self.Frames) do
 			gifFrame.WaitLoading(v)
 		end
@@ -135,15 +135,25 @@ end
 function gif.StartAnimation(self: GifStruct, noWaitLoad: boolean?)
 	self.AnimationRunning = true
 
-	if not self.IsLoaded then
+	if not self.IsLoaded then -- preload gif if it not been preloaded before
 		gif.Preload(self, noWaitLoad)
 	end
 
 	self.AnimationThread = task.spawn(function()
 		while (#self.Frames > self.Frame) and (#self.Frames ~= 0) do
+			local time = os.clock()
+
 			gif.Next(self)
 
-			task.wait(self.Frames[self.Frame].Time)
+			task.wait((function()
+				local t = self.Frames[self.Frame].Time - (os.clock() - time)
+
+				if t > 0 then
+					return t
+				else
+					return 0
+				end
+			end)())
 		end
 
 		self.AnimationRunning = false
@@ -181,7 +191,7 @@ end
 
 --[[
 	Reset animation.
-	if animation runnning now, run gif from first image
+	if animation running now, run gif from first image
 ]]
 function gif.ResetAnimation(self: GifStruct)
 	self.Frame = 0
@@ -267,6 +277,13 @@ function gif.SetParent(self: GifStruct, newParent: Frame?)
 end
 
 --[[
+	Get total animation time
+]]
+function gif.GetTotalAnimationTime(self: GifStruct): number
+	return algorithm.accumulate_by_prop(self.Frames, "Time")
+end
+
+--[[
 	Gif constructor
 
 	`images` - list of `GifFrame`s
@@ -275,7 +292,7 @@ end
 
 	`loopAnimation` - if true animation is will be looped
 
-	`ShowFirstFrameBeforeLoading` - Show the fisrst frame before animation start
+	`ShowFirstFrameBeforeLoading` - Show the first frame before animation start
 ]]
 function gif.new(
 	frames: { [number]: gifFrame.GifFrame }?,
@@ -284,7 +301,7 @@ function gif.new(
 	ShowFirstFrameBeforeStart: boolean?,
 	mode: number?
 ): Gif
-	local _ComplitedEvent = Instance.new("BindableEvent")
+	local _CompletedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
 
 	local self: GifStruct = {
@@ -292,8 +309,8 @@ function gif.new(
 		Frames = frames or {},
 		Frame = 0,
 		AnimationRunning = false,
-		Completed = _ComplitedEvent.Event,
-		CompletedEvent = _ComplitedEvent,
+		Completed = _CompletedEvent.Event,
+		CompletedEvent = _CompletedEvent,
 		Destroying = _DestroyingEvent.Event,
 		DestroyingEvent = _DestroyingEvent,
 		LoopAnimation = loopAnimation or false,

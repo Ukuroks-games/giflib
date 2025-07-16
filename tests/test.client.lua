@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local giflib = require(ReplicatedStorage.shared.giflib)
+local giflib = require(ReplicatedStorage.Packages.giflib)
 
 local imageLabel = Instance.new("Frame")
 
@@ -54,6 +54,8 @@ local combinedGif = giflib.gif.new({
 	giflib.Frame.new("87896583764508", 0.08),
 	giflib.Frame.new("118755832546495", 0.08),
 }, imageLabel2, true, false, giflib.gif.Mode.Combine)
+
+print("Total mygif animation time", mygif:GetTotalAnimationTime(), "sec")
 
 mygif:SetResampleMode(Enum.ResamplerMode.Pixelated)
 mygif:SetScaleType(Enum.ScaleType.Fit)

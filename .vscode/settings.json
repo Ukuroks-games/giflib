@@ -4,9 +4,10 @@
 	
 	"cSpell.enabled": true,
 	"cSpell.words": [
+		"Giflib",
 		"Roblox",
 		"rojo",
-		"Giflib"
+		"setmetatable"
 	],
 
 	"cSpell.ignorePaths": [
