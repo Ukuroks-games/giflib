@@ -144,15 +144,11 @@ function gif.StartAnimation(self: GifStruct, noWaitLoad: boolean?)
 
 			gif.Next(self)
 
-			task.wait((function()
-				local t = self.Frames[self.Frame].Time - (os.clock() - time)
+			local t = self.Frames[self.Frame].Time - (os.clock() - time)
 
-				if t > 0 then
-					return t
-				else
-					return 0
-				end
-			end)())
+			if t > 0 then
+				task.wait(t)
+			end
 		end
 
 		self.AnimationRunning = false
