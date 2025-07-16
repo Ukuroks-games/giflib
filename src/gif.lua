@@ -1,11 +1,10 @@
 -- Services
 
 local ContentProvider = game:GetService("ContentProvider")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Libraries
 
-local algorithm = require(ReplicatedStorage.Packages.stdlib).algorithm
+local algorithm = require(script.Parent.Parent.stdlib).algorithm
 
 local gifFrame = require(script.Parent.gifFrame)
 

@@ -53,7 +53,7 @@
             "type": "shell",
             "label": "Build rbxm",
             "detail": "Build rbxm library",
-            "command": "make 2d-adventurelib.rbxm && exit",
+            "command": "make rbxm && exit",
             "group": {
                 "kind": "build",
                 "isDefault": false
