@@ -7,6 +7,7 @@
 		"Giflib",
 		"rbxl",
 		"rbxm",
+		"Resampler",
 		"Roblox",
 		"rojo",
 		"setmetatable"
@@ -20,5 +21,6 @@
 	],
 
 	"luau-lsp.sourcemap.rojoProjectFile": "tests.project.json",
-	"luau-lsp.platform.type": "roblox"
+	"luau-lsp.platform.type": "roblox",
+	"makefile.configureOnOpen": false
 }

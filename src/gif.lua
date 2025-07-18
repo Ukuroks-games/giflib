@@ -79,6 +79,9 @@ export type GifStruct = {
 	]]
 	AnimationThread: thread,
 
+	--[[
+		Gif mode. See gif.Mode
+	]]
 	Mode: number,
 }
 
@@ -238,6 +241,8 @@ end
 
 --[[
 	Set images transparency
+
+	not working normally with combine mode
 ]]
 function gif.SetTransparency(self: GifStruct, newTransparency: number)
 	for _, v in pairs(self.Frames) do
@@ -276,6 +281,14 @@ end
 ]]
 function gif.GetTotalAnimationTime(self: GifStruct): number
 	return algorithm.accumulate_by_prop(self.Frames, "Time")
+end
+
+--[[
+	Add frame
+]]
+function gif.AddFrame(self: GifStruct, frame: gifFrame.GifFrame)
+	self.IsLoaded = self.IsLoaded and frame.Image.IsLoaded
+	table.insert(self.Frames, frame)
 end
 
 --[[
