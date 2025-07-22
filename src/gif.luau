@@ -167,6 +167,8 @@ function gif.StopAnimation(self: GifStruct)
 	if self.AnimationRunning and self.AnimationThread then
 		task.cancel(self.AnimationThread)
 		self.AnimationThread = nil
+	else
+		warn("Animation", self, "not been started yet")
 	end
 
 	self.AnimationRunning = false
@@ -189,7 +191,6 @@ end
 
 --[[
 	Reset animation.
-	if animation running now, run gif from first image
 ]]
 function gif.ResetAnimation(self: GifStruct)
 	self.Frame = 0
@@ -197,7 +198,13 @@ function gif.ResetAnimation(self: GifStruct)
 	if self.Mode == gif.Mode.Combine then
 		gif.Hide(self)
 	end
+end
 
+--[[
+	Restart animation
+]]
+function gif.RestartAnimation(self: GifStruct)
+	gif.ResetAnimation(self)
 	gif.StartAnimation(self)
 end
 
@@ -345,7 +352,7 @@ function gif.new(
 
 	self.Completed:Connect(function()
 		if self.LoopAnimation then
-			gif.ResetAnimation(self)
+			gif.RestartAnimation(self)
 		else
 			gif.StopAnimation(self)
 		end
