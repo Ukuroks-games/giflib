@@ -142,7 +142,7 @@ function gif.StartAnimation(self: GifStruct, noWaitLoad: boolean?)
 	end
 
 	self.AnimationThread = task.spawn(function()
-		while (#self.Frames > self.Frame) and (#self.Frames ~= 0) do
+		while (#self.Frames > self.Frame) and (#self.Frames ~= 0) and (self.AnimationRunning == true) do
 			local time = os.clock()
 
 			gif.Next(self)
