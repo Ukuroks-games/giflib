@@ -16,16 +16,18 @@ BUILD_DIR = build
 
 RBXM_BUILD = $(LIBNAME).rbxm
 
-SOURCES =	src/gif.lua	\
-			src/gifFrame.lua	\
-			src/init.lua
+SOURCES =	src/gif.luau	\
+			src/gifFrame.luau	\
+			src/init.luau
 
+TEST_SOURCES =	tests/test.client.luau	\
+				tests/combine.client.luau
 $(BUILD_DIR): 
 	mkdir $@
 
 ./Packages: wally.toml
 	wally install
-	
+
 
 
 configure: clean-build $(BUILD_DIR) wally.toml $(SOURCES)
@@ -46,7 +48,7 @@ $(RBXM_BUILD): library.project.json	$(SOURCES)
 
 rbxm: clean-rbxm $(RBXM_BUILD)
 
-tests.rbxl: ./Packages tests.project.json $(SOURCES) tests/test.client.lua
+tests.rbxl: ./Packages tests.project.json $(SOURCES) 
 	rojo build tests.project.json --output $@
 
 tests: clean-tests tests.rbxl
