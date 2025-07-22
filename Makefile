@@ -48,7 +48,7 @@ $(RBXM_BUILD): library.project.json	$(SOURCES)
 
 rbxm: clean-rbxm $(RBXM_BUILD)
 
-tests.rbxl: ./Packages tests.project.json $(SOURCES) 
+tests.rbxl: ./Packages tests.project.json $(SOURCES) $(TEST_SOURCES)
 	rojo build tests.project.json --output $@
 
 tests: clean-tests tests.rbxl
@@ -72,9 +72,5 @@ clean-tests:
 clean-build:
 	$(RM) $(BUILD_DIR)
 
-clean: clean-tests clean-build clean-rbxm
-	$(RM) $(PACKAGE_NAME) sourcemap.json: ./Packages
-	rojo sourcemap tests.project.json --output $@
-
-delete-sourcemap: 
-	$(RM) sourcemap.json
+clean: clean-tests clean-build clean-rbxm clean-sourcemap
+	$(RM) $(PACKAGE_NAME) ./Packages

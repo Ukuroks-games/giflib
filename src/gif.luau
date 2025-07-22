@@ -135,29 +135,37 @@ end
 	Start gif animation
 ]]
 function gif.StartAnimation(self: GifStruct, noWaitLoad: boolean?)
-	self.AnimationRunning = true
+	if self.AnimationRunning ~= true then
+		self.AnimationRunning = true
 
-	if not self.IsLoaded then -- preload gif if it not been preloaded before
-		gif.Preload(self, noWaitLoad)
-	end
-
-	self.AnimationThread = task.spawn(function()
-		while (#self.Frames > self.Frame) and (#self.Frames ~= 0) and (self.AnimationRunning == true) do
-			local time = os.clock()
-
-			gif.Next(self)
-
-			local t = self.Frames[self.Frame].Time - (os.clock() - time)
-
-			if t > 0 then
-				task.wait(t)
-			end
+		if not self.IsLoaded then -- preload gif if it not been preloaded before
+			gif.Preload(self, noWaitLoad)
 		end
 
-		self.AnimationRunning = false
+		self.AnimationThread = task.spawn(function()
+			while
+				(#self.Frames > self.Frame)
+				and (#self.Frames ~= 0)
+				and (self.AnimationRunning == true)
+			do
+				local time = os.clock()
 
-		self.CompletedEvent:Fire()
-	end)
+				gif.Next(self)
+
+				local t = self.Frames[self.Frame].Time - (os.clock() - time)
+
+				if t > 0 then
+					task.wait(t)
+				end
+			end
+
+			self.AnimationRunning = false
+
+			self.CompletedEvent:Fire()
+		end)
+	else
+		warn("Animation already running")
+	end
 end
 
 --[[
