@@ -117,14 +117,24 @@ end
 --[[
 	Wait all image loading
 ]]
-function gif.Preload(self: GifStruct, noWaitLoad: boolean?, skipDelay: number?)
+function gif.Preload(self: GifStruct, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
 		algorithm.copy_by_prop(self.Frames, "Image.Image")
 	)
 
-	if noWaitLoad ~= true then
+	if
+		(typeof(skip) == "boolean" and skip ~= true)
+		or (typeof(skip) == "number")
+	then
+		local delay = (function()
+			if typeof(skip) == "number" then
+				return skip
+			else
+				return 20
+			end
+		end)()
 		for _, v in pairs(self.Frames) do
-			gifFrame.WaitLoading(v, (skipDelay or 20) / #self.Frames)
+			gifFrame.WaitLoading(v, delay / #self.Frames)
 		end
 	end
 
@@ -134,16 +144,12 @@ end
 --[[
 	Start gif animation
 ]]
-function gif.StartAnimation(
-	self: GifStruct,
-	noWaitLoad: boolean?,
-	skipDelay: number?
-)
+function gif.StartAnimation(self: GifStruct, skip: number? | boolean?)
 	if self.AnimationRunning ~= true then
 		self.AnimationRunning = true
 
 		if not self.IsLoaded then -- preload gif if it not been preloaded before
-			gif.Preload(self, noWaitLoad, skipDelay)
+			gif.Preload(self, skip)
 		end
 
 		self.AnimationThread = task.spawn(function()
@@ -217,13 +223,9 @@ end
 --[[
 	Restart animation
 ]]
-function gif.RestartAnimation(
-	self: GifStruct,
-	skipPreload: boolean?,
-	skipDelay: number?
-)
+function gif.RestartAnimation(self: GifStruct, skip: number? | boolean?)
 	gif.ResetAnimation(self)
-	gif.StartAnimation(self, skipPreload, skipDelay)
+	gif.StartAnimation(self, skip)
 end
 
 --[[
