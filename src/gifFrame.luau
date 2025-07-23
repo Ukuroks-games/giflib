@@ -3,9 +3,11 @@
 local ContentProvider = game:GetService("ContentProvider")
 local Players = game:GetService("Players")
 
---[[
+--[=[
+	@class gifFrame
+
 	Gif frame class
-]]
+]=]
 local gifFrame = {}
 
 local function CreateGui(name: string): Instance
@@ -25,34 +27,35 @@ end
 ]]
 local Gui = CreateGui("GifPreloadGui")
 
---[[
-	gifFrame struct
-]]
+--[=[
+	@type gifFrame struct
+	@within gifFrame
+]=]
 export type GifFrameStruct = {
 
-	--[[
+	--[=[
 		Label with image
-	]]
+	]=]
 	Image: ImageLabel,
 
-	--[[
+	--[=[
 		delay on this image
-	]]
+	]=]
 	Time: number,
 }
 
 export type GifFrame = GifFrameStruct & typeof(gifFrame)
 
---[[
+--[=[
 	Preload frame
-]]
+]=]
 function gifFrame.Preload(self: GifFrame)
 	ContentProvider:PreloadAsync(self.Image.Image)
 end
 
---[[
+--[=[
 	Wait image loading
-]]
+]=]
 function gifFrame.WaitLoading(self: GifFrame, skipDelay: number?)
 	local t = os.clock()
 	while not self.Image.IsLoaded do
@@ -64,34 +67,34 @@ function gifFrame.WaitLoading(self: GifFrame, skipDelay: number?)
 	end
 end
 
---[[
+--[=[
 	Destroy gif frame
-]]
+]=]
 function gifFrame.Destroy(self: GifFrame)
 	self.Image:Destroy()
 end
 
---[[
+--[=[
 	Show frame.
 
 	`parent` is Gif.ImageLabel
-]]
+]=]
 function gifFrame.Show(self: GifFrame, parent: Frame)
 	self.Image.Position = UDim2.fromScale(0, 0)
 	self.Image.Parent = parent
 end
 
---[[
+--[=[
 	Hide frame
-]]
+]=]
 function gifFrame.Hide(self: GifFrame)
 	self.Image.Position = UDim2.fromScale(1, 1)
 	self.Image.Parent = Gui
 end
 
---[[
+--[=[
 	Gif frame constructor
-]]
+]=]
 function gifFrame.new(id: string, t: number): GifFrame
 	if
 		(not id:find("http://www.roblox.com/asset/?id="))
