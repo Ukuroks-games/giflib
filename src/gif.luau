@@ -117,14 +117,14 @@ end
 --[[
 	Wait all image loading
 ]]
-function gif.Preload(self: GifStruct, noWaitLoad: boolean?)
+function gif.Preload(self: GifStruct, noWaitLoad: boolean?, skipDelay: number?)
 	ContentProvider:PreloadAsync(
 		algorithm.copy_by_prop(self.Frames, "Image.Image")
 	)
 
 	if noWaitLoad ~= true then
 		for _, v in pairs(self.Frames) do
-			gifFrame.WaitLoading(v)
+			gifFrame.WaitLoading(v, (skipDelay or 20) / #self.Frames)
 		end
 	end
 
@@ -134,12 +134,16 @@ end
 --[[
 	Start gif animation
 ]]
-function gif.StartAnimation(self: GifStruct, noWaitLoad: boolean?)
+function gif.StartAnimation(
+	self: GifStruct,
+	noWaitLoad: boolean?,
+	skipDelay: number?
+)
 	if self.AnimationRunning ~= true then
 		self.AnimationRunning = true
 
 		if not self.IsLoaded then -- preload gif if it not been preloaded before
-			gif.Preload(self, noWaitLoad)
+			gif.Preload(self, noWaitLoad, skipDelay)
 		end
 
 		self.AnimationThread = task.spawn(function()
@@ -175,6 +179,8 @@ function gif.StopAnimation(self: GifStruct)
 	if self.AnimationRunning and self.AnimationThread then
 		task.cancel(self.AnimationThread)
 		self.AnimationThread = nil
+	elseif self.AnimationRunning then
+		warn("StartAnimation not been done")
 	else
 		warn("Animation", self, "not been started yet")
 	end
@@ -211,9 +217,13 @@ end
 --[[
 	Restart animation
 ]]
-function gif.RestartAnimation(self: GifStruct, skipPreload: boolean?)
+function gif.RestartAnimation(
+	self: GifStruct,
+	skipPreload: boolean?,
+	skipDelay: number?
+)
 	gif.ResetAnimation(self)
-	gif.StartAnimation(self, skipPreload)
+	gif.StartAnimation(self, skipPreload, skipDelay)
 end
 
 --[[
@@ -309,9 +319,9 @@ end
 --[[
 	Gif constructor
 
-	`images` - list of `GifFrame`s
+	`frames` - list of `GifFrame`s
 
-	`Label` - то на чем отображается гифка
+	`parent` - то на чем отображается гифка
 
 	`loopAnimation` - if true animation is will be looped
 

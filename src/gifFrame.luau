@@ -53,9 +53,14 @@ end
 --[[
 	Wait image loading
 ]]
-function gifFrame.WaitLoading(self: GifFrame)
+function gifFrame.WaitLoading(self: GifFrame, skipDelay: number?)
+	local t = os.clock()
 	while not self.Image.IsLoaded do
 		task.wait()
+		if  (os.clock() - t) > (skipDelay or 10) then
+			warn("Loading may be so long...")
+			break
+		end
 	end
 end
 
