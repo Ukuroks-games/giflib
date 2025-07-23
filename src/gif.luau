@@ -211,9 +211,9 @@ end
 --[[
 	Restart animation
 ]]
-function gif.RestartAnimation(self: GifStruct)
+function gif.RestartAnimation(self: GifStruct, skipPreload: boolean?)
 	gif.ResetAnimation(self)
-	gif.StartAnimation(self)
+	gif.StartAnimation(self, skipPreload)
 end
 
 --[[
