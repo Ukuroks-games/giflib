@@ -18,9 +18,6 @@ gif.Mode = {
 	Combine = 1,
 }
 
---[[
-	Gif struct
-]]
 export type GifStruct = {
 	--[[
 		List of gif frames
@@ -86,9 +83,9 @@ export type GifStruct = {
 }
 
 --[[
-	Gif type
+	Gif struct
 ]]
-export type Gif = GifStruct & typeof(gif)
+export type Gif = typeof(setmetatable({} :: GifStruct, {__index = gif}))
 
 --[[
 	Destroy gif
@@ -174,7 +171,7 @@ function gif.StartAnimation(self: GifStruct, skip: number? | boolean?)
 			self.CompletedEvent:Fire()
 		end)
 	else
-		warn("Animation already running")
+		warn("")
 	end
 end
 
@@ -323,7 +320,7 @@ end
 
 	`frames` - list of `GifFrame`s
 
-	`parent` - то на чем отображается гифка
+	`parent` - gif surface. Parent for all frames
 
 	`loopAnimation` - if true animation is will be looped
 

@@ -33,7 +33,7 @@ export type GifFrameStruct = {
 	Time: number,
 }
 
-export type GifFrame = GifFrameStruct & typeof(gifFrame)
+export type GifFrame = typeof(setmetatable({} :: GifFrameStruct, {__index = gifFrame}))
 
 --[[
 	Preload frame
