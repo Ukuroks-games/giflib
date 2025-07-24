@@ -9,7 +9,7 @@ local algorithm = require(script.Parent.Parent.stdlib).algorithm
 local gifFrame = require(script.Parent.gifFrame)
 
 --[[
-	# Library for creating gifs
+	# Library for creating gif
 ]]
 local gif = {}
 
@@ -23,7 +23,7 @@ gif.Mode = {
 ]]
 export type GifStruct = {
 	--[[
-		Список кадров в гифке
+		List of gif frames
 	]]
 	Frames: { gifFrame.GifFrame },
 
@@ -43,7 +43,7 @@ export type GifStruct = {
 	AnimationRunning: boolean,
 
 	--[[
-		Гифка зацикленна.
+		Gif is looped
 
 		if true animation is will be looped.
 	]]
@@ -55,7 +55,7 @@ export type GifStruct = {
 	IsLoaded: boolean,
 
 	--[[
-		Показывает что анимация завершилась
+		Fire where gif animation completed
 	]]
 	Completed: RBXScriptSignal,
 

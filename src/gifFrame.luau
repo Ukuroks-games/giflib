@@ -3,27 +3,19 @@
 local ContentProvider = game:GetService("ContentProvider")
 local Players = game:GetService("Players")
 
+-- Libraries
+
+local stdlib = require(script.Parent.Parent.stdlib)
+
 --[[
 	Gif frame class
 ]]
 local gifFrame = {}
 
-local function CreateGui(name: string): Instance
-	local a = Players.LocalPlayer.PlayerGui:FindFirstChild(name)
-
-	if not a then
-		a = Instance.new("ScreenGui")
-		a.Parent = Players.LocalPlayer.PlayerGui
-		a.Name = name
-	end
-
-	return a
-end
-
 --[[
 	Gui for preloading a images
 ]]
-local Gui = CreateGui("GifPreloadGui")
+local Gui = stdlib.utility.CreateOrFindInstance("GifPreloadGui", "ScreenGui", Players.LocalPlayer.PlayerGui)
 
 --[[
 	gifFrame struct

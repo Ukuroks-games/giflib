@@ -19,7 +19,7 @@ authors = ["Egor00f <velikiydolbayeb@gmail.com>"]
 private = false
 
 [dependencies]
-stdlib = "egor00f/stdlib@>=0.1.16"
+stdlib = "egor00f/stdlib@>=0.1.18"
 
 [server-dependencies]
 
