@@ -3,6 +3,7 @@
 	"editor.defaultFormatter": "JohnnyMorganz.stylua",
 	"cSpell.enabled": true,
 	"cSpell.words": [
+		"gif",
 		"Giflib",
 		"rbxassetid",
 		"rbxl",
@@ -12,7 +13,7 @@
 		"rojo",
 		"setmetatable",
 		"stdlib",
-		"gif"
+		"tostring"
 	],
 	"cSpell.ignorePaths": [
 		".git/objects",

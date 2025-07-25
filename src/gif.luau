@@ -116,7 +116,13 @@ end
 ]]
 function gif.Preload(self: GifStruct, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
-		algorithm.copy_by_prop(self.Frames, "Image.Image")
+		algorithm.copy_by_prop(self.Frames, "Image.Image"),
+		function(assetId: string, assetFetchStatus: Enum.AssetFetchStatus)
+			if assetFetchStatus == Enum.AssetFetchStatus.TimedOut or assetFetchStatus == Enum.AssetFetchStatus.Failure then
+				print(assetFetchStatus)
+				warn(tostring(assetFetchStatus) .. " to load " .. assetId)
+			end
+		end
 	)
 
 	if
@@ -171,7 +177,7 @@ function gif.StartAnimation(self: GifStruct, skip: number? | boolean?)
 			self.CompletedEvent:Fire()
 		end)
 	else
-		warn("")
+		warn("Animation already running")
 	end
 end
 
