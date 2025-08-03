@@ -145,6 +145,31 @@ function gif.Preload(self: Gif, skip: number? | boolean?)
 end
 
 --[[
+	
+]]
+function gif.AnimationLoop(self: Gif)
+	while
+		(#self.Frames > self.Frame)
+		and (#self.Frames ~= 0)
+		and (self.AnimationRunning == true)
+	do
+		local time = os.clock()
+
+		gif.Next(self)
+
+		local t = self.Frames[self.Frame].Time - (os.clock() - time)
+
+		if t > 0 then
+			task.wait(t)
+		end
+	end
+
+	self.AnimationRunning = false
+
+	self.CompletedEvent:Fire()
+end
+
+--[[
 	Start gif animation
 ]]
 function gif.StartAnimation(self: Gif, skip: number? | boolean?)
@@ -155,27 +180,7 @@ function gif.StartAnimation(self: Gif, skip: number? | boolean?)
 			gif.Preload(self, skip)
 		end
 
-		self.AnimationThread = task.spawn(function()
-			while
-				(#self.Frames > self.Frame)
-				and (#self.Frames ~= 0)
-				and (self.AnimationRunning == true)
-			do
-				local time = os.clock()
-
-				gif.Next(self)
-
-				local t = self.Frames[self.Frame].Time - (os.clock() - time)
-
-				if t > 0 then
-					task.wait(t)
-				end
-			end
-
-			self.AnimationRunning = false
-
-			self.CompletedEvent:Fire()
-		end)
+		self.AnimationThread = task.spawn(gif.AnimationLoop, self)
 	else
 		warn("Animation already running")
 	end
