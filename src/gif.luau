@@ -90,7 +90,7 @@ export type Gif = typeof(setmetatable({} :: GifStruct, {__index = gif}))
 --[[
 	Destroy gif
 ]]
-function gif.Destroy(self: GifStruct, notDestroyFrames: boolean?)
+function gif.Destroy(self: Gif, notDestroyFrames: boolean?)
 	self.DestroyingEvent:Fire()
 
 	-- Если анимация всё ещё запущенна
@@ -114,7 +114,7 @@ end
 --[[
 	Wait all image loading
 ]]
-function gif.Preload(self: GifStruct, skip: number? | boolean?)
+function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
 		algorithm.copy_by_prop(self.Frames, "Image.Image"),
 		function(assetId: string, assetFetchStatus: Enum.AssetFetchStatus)
@@ -147,7 +147,7 @@ end
 --[[
 	Start gif animation
 ]]
-function gif.StartAnimation(self: GifStruct, skip: number? | boolean?)
+function gif.StartAnimation(self: Gif, skip: number? | boolean?)
 	if self.AnimationRunning ~= true then
 		self.AnimationRunning = true
 
@@ -184,7 +184,7 @@ end
 --[[
 	Stop gif animation
 ]]
-function gif.StopAnimation(self: GifStruct)
+function gif.StopAnimation(self: Gif)
 	if self.AnimationRunning and self.AnimationThread then
 		task.cancel(self.AnimationThread)
 		self.AnimationThread = nil
@@ -200,7 +200,7 @@ end
 --[[
 	Set current frame, that showing now
 ]]
-function gif.SetFrame(self: GifStruct, frame: number)
+function gif.SetFrame(self: Gif, frame: number)
 	if self.Parent then
 		gifFrame.Show(self.Frames[frame], self.Parent)
 
@@ -215,7 +215,7 @@ end
 --[[
 	Reset animation.
 ]]
-function gif.ResetAnimation(self: GifStruct)
+function gif.ResetAnimation(self: Gif)
 	self.Frame = 0
 
 	if self.Mode == gif.Mode.Combine then
@@ -226,7 +226,7 @@ end
 --[[
 	Restart animation
 ]]
-function gif.RestartAnimation(self: GifStruct, skip: number? | boolean?)
+function gif.RestartAnimation(self: Gif, skip: number? | boolean?)
 	gif.ResetAnimation(self)
 	gif.StartAnimation(self, skip)
 end
@@ -234,14 +234,14 @@ end
 --[[
 	Next frame
 ]]
-function gif.Next(self: GifStruct)
+function gif.Next(self: Gif)
 	gif.SetFrame(self, self.Frame + 1)
 end
 
 --[[
 	Hide gif frames
 ]]
-function gif.Hide(self: GifStruct)
+function gif.Hide(self: Gif)
 	for _, v in pairs(self.Frames) do
 		gifFrame.Hide(v)
 	end
@@ -250,7 +250,7 @@ end
 --[[
 	Set frames background transparency
 ]]
-function gif.SetBackgroundTransparency(self: GifStruct, newTransparency: number)
+function gif.SetBackgroundTransparency(self: Gif, newTransparency: number)
 	if self.Mode == gif.Mode.Combine then
 		self.Frames[1].Image.BackgroundTransparency = newTransparency
 	else
@@ -263,7 +263,7 @@ end
 --[[
 	Set frames background color
 ]]
-function gif.SetBackgroundColor(self: GifStruct, newColor: Color3)
+function gif.SetBackgroundColor(self: Gif, newColor: Color3)
 	for _, v in pairs(self.Frames) do
 		v.Image.BackgroundColor3 = newColor
 	end
@@ -274,7 +274,7 @@ end
 
 	not working normally with combine mode
 ]]
-function gif.SetTransparency(self: GifStruct, newTransparency: number)
+function gif.SetTransparency(self: Gif, newTransparency: number)
 	for _, v in pairs(self.Frames) do
 		v.Image.ImageTransparency = newTransparency
 	end
@@ -283,7 +283,7 @@ end
 --[[
 	Set scale type
 ]]
-function gif.SetScaleType(self: GifStruct, scaleType: Enum.ScaleType)
+function gif.SetScaleType(self: Gif, scaleType: Enum.ScaleType)
 	for _, v in pairs(self.Frames) do
 		v.Image.ScaleType = scaleType
 	end
@@ -292,7 +292,7 @@ end
 --[[
 	Set resample mode
 ]]
-function gif.SetResampleMode(self: GifStruct, resampleMode: Enum.ResamplerMode)
+function gif.SetResampleMode(self: Gif, resampleMode: Enum.ResamplerMode)
 	for _, v in pairs(self.Frames) do
 		v.Image.ResampleMode = resampleMode
 	end
@@ -301,7 +301,7 @@ end
 --[[
 	Set gif parent
 ]]
-function gif.SetParent(self: GifStruct, newParent: Frame?)
+function gif.SetParent(self: Gif, newParent: Frame?)
 	self.Parent = newParent
 	self.Frames[self.Frame].Image.Parent = newParent
 end
@@ -309,14 +309,14 @@ end
 --[[
 	Get total animation time
 ]]
-function gif.GetTotalAnimationTime(self: GifStruct): number
+function gif.GetTotalAnimationTime(self: Gif): number
 	return algorithm.accumulate_by_prop(self.Frames, "Time")
 end
 
 --[[
 	Add frame
 ]]
-function gif.AddFrame(self: GifStruct, frame: gifFrame.GifFrame)
+function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 	self.IsLoaded = self.IsLoaded and frame.Image.IsLoaded
 	table.insert(self.Frames, frame)
 end
@@ -357,6 +357,8 @@ function gif.new(
 		Mode = mode or gif.Mode.Replace,
 	}
 
+	setmetatable(self, { __index = gif })
+
 	gif.Hide(self)
 
 	if ShowFirstFrameBeforeStart == true then
@@ -380,8 +382,6 @@ function gif.new(
 			gif.StopAnimation(self)
 		end
 	end)
-
-	setmetatable(self, { __index = gif })
 
 	return self
 end
