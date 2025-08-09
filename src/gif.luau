@@ -24,21 +24,29 @@ gif.Mode = {
 export type GifStruct = {
 	--[[
 		List of gif frames
+
+		[wiki](https://github.com/Ukuroks-games/giflib/wiki/Gif#frames--gifframegifframe-)
 	]]
 	Frames: { gifFrame.GifFrame },
 
 	--[[
 		Gif surface
+
+		[wiki](https://github.com/Ukuroks-games/giflib/wiki/Gif#parent-guibase)
 	]]
-	Parent: Frame?,
+	Parent: GuiBase?,
 
 	--[[
 		Current frame num
+
+		[wiki](https://github.com/Ukuroks-games/giflib/wiki/Gif#frame-number)
 	]]
 	Frame: number,
 
 	--[[
 		Анимация сейчас запущенна
+
+		[wiki](https://github.com/Ukuroks-games/giflib/wiki/Gif#animationrunning-boolean)
 	]]
 	AnimationRunning: boolean,
 
@@ -46,41 +54,57 @@ export type GifStruct = {
 		Gif is looped
 
 		if true animation is will be looped.
+
+		[wiki](https://github.com/Ukuroks-games/giflib/wiki/Gif#loopanimation-boolean)
 	]]
 	LoopAnimation: boolean,
 
 	--[[
 		Images are preloaded
+
+		[wiki](
 	]]
 	IsLoaded: boolean,
 
 	--[[
 		Fire where gif animation completed
+
+		[wiki](
 	]]
 	Completed: RBXScriptSignal,
 
 	--[[
 		Fire where gif animation completed
+
+		[wiki](
 	]]
 	CompletedEvent: BindableEvent,
 
 	--[[
 		Fire if gif destroying(Destroy called)
+
+		[wiki](
 	]]
 	Destroying: RBXScriptConnection,
 
 	--[[
 		Fire where Destroy call
+
+		[wiki](
 	]]
 	DestroyingEvent: BindableEvent,
 
 	--[[
 		Thread int that gif animation running
+
+		[wiki](
 	]]
 	AnimationThread: thread,
 
 	--[[
 		Gif mode. See gif.Mode
+
+		[wiki](https://github.com/Ukuroks-games/giflib/wiki/Gif#mode-number)
 	]]
 	Mode: number,
 }
@@ -92,6 +116,8 @@ export type Gif = typeof(setmetatable({} :: GifStruct, {__index = gif}))
 
 --[[
 	Destroy gif
+
+	[wiki](
 ]]
 function gif.Destroy(self: Gif, notDestroyFrames: boolean?)
 	self.DestroyingEvent:Fire()
@@ -116,6 +142,8 @@ end
 
 --[[
 	Wait all image loading
+
+	[wiki](
 ]]
 function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
@@ -148,7 +176,7 @@ function gif.Preload(self: Gif, skip: number? | boolean?)
 end
 
 --[[
-	
+	[wiki](
 ]]
 function gif.AnimationLoop(self: Gif)
 	while
@@ -174,6 +202,8 @@ end
 
 --[[
 	Start gif animation
+
+	[wiki](
 ]]
 function gif.StartAnimation(self: Gif, skip: number? | boolean?)
 	if self.AnimationRunning ~= true then
@@ -191,6 +221,8 @@ end
 
 --[[
 	Stop gif animation
+
+	[wiki](
 ]]
 function gif.StopAnimation(self: Gif)
 	if self.AnimationRunning and self.AnimationThread then
@@ -207,6 +239,8 @@ end
 
 --[[
 	Set current frame, that showing now
+
+	[wiki](
 ]]
 function gif.SetFrame(self: Gif, frame: number)
 	if self.Parent and self.Frames[frame] then
@@ -224,6 +258,8 @@ end
 
 --[[
 	Reset animation.
+
+	[wiki](
 ]]
 function gif.ResetAnimation(self: Gif)
 	self.Frame = 0
@@ -235,6 +271,8 @@ end
 
 --[[
 	Restart animation
+
+	[wiki](
 ]]
 function gif.RestartAnimation(self: Gif, skip: number? | boolean?)
 	gif.ResetAnimation(self)
@@ -243,6 +281,8 @@ end
 
 --[[
 	Next frame
+
+	[wiki](
 ]]
 function gif.Next(self: Gif)
 	gif.SetFrame(self, self.Frame + 1)
@@ -250,6 +290,8 @@ end
 
 --[[
 	Hide gif frames
+
+	[wiki](
 ]]
 function gif.Hide(self: Gif)
 	for _, v in pairs(self.Frames) do
@@ -259,6 +301,8 @@ end
 
 --[[
 	Set frames background transparency
+
+	[wiki](
 ]]
 function gif.SetBackgroundTransparency(self: Gif, newTransparency: number)
 	if self.Mode == gif.Mode.Combine then
@@ -274,6 +318,8 @@ end
 
 --[[
 	Set frames background color
+
+	[wiki](
 ]]
 function gif.SetBackgroundColor(self: Gif, newColor: Color3)
 	for _, v in pairs(self.Frames) do
@@ -285,6 +331,8 @@ end
 	Set images transparency
 
 	not working normally with combine mode
+
+	[wiki](
 ]]
 function gif.SetTransparency(self: Gif, newTransparency: number)
 	for _, v in pairs(self.Frames) do
@@ -294,6 +342,8 @@ end
 
 --[[
 	Set scale type
+
+	[wiki](
 ]]
 function gif.SetScaleType(self: Gif, scaleType: Enum.ScaleType)
 	for _, v in pairs(self.Frames) do
@@ -303,6 +353,8 @@ end
 
 --[[
 	Set resample mode
+
+	[wiki](
 ]]
 function gif.SetResampleMode(self: Gif, resampleMode: Enum.ResamplerMode)
 	for _, v in pairs(self.Frames) do
@@ -312,6 +364,8 @@ end
 
 --[[
 	Set gif parent
+
+	[wiki](
 ]]
 function gif.SetParent(self: Gif, newParent: Frame?)
 	self.Parent = newParent
@@ -320,6 +374,8 @@ end
 
 --[[
 	Get total animation time
+
+	[wiki](
 ]]
 function gif.GetTotalAnimationTime(self: Gif): number
 	return algorithm.accumulate_by_prop(self.Frames, "Time")
@@ -327,6 +383,8 @@ end
 
 --[[
 	Add frame
+
+	[wiki](
 ]]
 function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 	self.IsLoaded = self.IsLoaded and frame.Image.IsLoaded
@@ -343,6 +401,8 @@ end
 	`loopAnimation` - if true animation is will be looped
 
 	`ShowFirstFrameBeforeLoading` - Show the first frame before animation start
+
+	[wiki](
 ]]
 function gif.new(
 	frames: { [number]: gifFrame.GifFrame }?,
