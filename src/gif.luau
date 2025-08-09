@@ -13,6 +13,9 @@ local gifFrame = require(script.Parent.gifFrame)
 ]]
 local gif = {}
 
+--[[
+	Gif mode
+]]
 gif.Mode = {
 	Replace = 0,
 	Combine = 1,
@@ -206,12 +209,14 @@ end
 	Set current frame, that showing now
 ]]
 function gif.SetFrame(self: Gif, frame: number)
-	if self.Parent then
+	if self.Parent and self.Frames[frame] then
 		gifFrame.Show(self.Frames[frame], self.Parent)
 
 		if self.Frame ~= 0 and self.Mode == gif.Mode.Replace then
 			gifFrame.Hide(self.Frames[self.Frame]) -- hide last frame
 		end
+	else
+		warn("Parent or self.Frames[" .. frame .. "] not exist")
 	end
 
 	self.Frame = frame
@@ -258,10 +263,12 @@ end
 function gif.SetBackgroundTransparency(self: Gif, newTransparency: number)
 	if self.Mode == gif.Mode.Combine then
 		self.Frames[1].Image.BackgroundTransparency = newTransparency
-	else
+	elseif self.Mode == gif.Mode.Replace then
 		for _, v in pairs(self.Frames) do
 			v.Image.BackgroundTransparency = newTransparency
 		end
+	else
+		warn("unknown mode" .. tostring(self.Mode))
 	end
 end
 
