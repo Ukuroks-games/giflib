@@ -17,7 +17,14 @@ local gif = {}
 	Gif mode
 ]]
 gif.Mode = {
+	--[[
+		Next frame replace last frame
+	]]
 	Replace = 0,
+
+	--[[
+		The next layer is superimposed on the previous one
+	]]
 	Combine = 1,
 }
 
@@ -88,7 +95,7 @@ export type GifStruct = {
 --[[
 	Gif struct
 ]]
-export type Gif = typeof(setmetatable({} :: GifStruct, {__index = gif}))
+export type Gif = typeof(setmetatable({} :: GifStruct, { __index = gif }))
 
 --[[
 	Destroy gif
@@ -121,7 +128,10 @@ function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
 		algorithm.copy_by_prop(self.Frames, "Image.Image"),
 		function(assetId: string, assetFetchStatus: Enum.AssetFetchStatus)
-			if assetFetchStatus == Enum.AssetFetchStatus.TimedOut or assetFetchStatus == Enum.AssetFetchStatus.Failure then
+			if
+				assetFetchStatus == Enum.AssetFetchStatus.TimedOut
+				or assetFetchStatus == Enum.AssetFetchStatus.Failure
+			then
 				print(assetFetchStatus)
 				warn(tostring(assetFetchStatus) .. " to load " .. assetId)
 			end
@@ -136,11 +146,12 @@ function gif.Preload(self: Gif, skip: number? | boolean?)
 			if typeof(skip) == "number" then
 				return skip
 			else
-				return 20
+				return 5
 			end
-		end)()
+		end)() / #self.Frames
+
 		for _, v in pairs(self.Frames) do
-			gifFrame.WaitLoading(v, delay / #self.Frames)
+			gifFrame.WaitLoading(v, delay)
 		end
 	end
 
@@ -148,7 +159,7 @@ function gif.Preload(self: Gif, skip: number? | boolean?)
 end
 
 --[[
-	
+	Main animation loop
 ]]
 function gif.AnimationLoop(self: Gif)
 	while
@@ -284,7 +295,7 @@ end
 --[[
 	Set images transparency
 
-	not working normally with combine mode
+	You shouldn't use this function with Combine mode.
 ]]
 function gif.SetTransparency(self: Gif, newTransparency: number)
 	for _, v in pairs(self.Frames) do
