@@ -1,3 +1,5 @@
+--!strict
+
 -- Services
 
 local ContentProvider = game:GetService("ContentProvider")
@@ -46,7 +48,7 @@ export type GifFrame = typeof(setmetatable(
 	Preload frame
 ]]
 function gifFrame.Preload(self: GifFrame)
-	ContentProvider:PreloadAsync(self.Image.Image)
+	ContentProvider:PreloadAsync({self.Image.Image})
 end
 
 --[[
@@ -75,7 +77,7 @@ end
 
 	`parent` is Gif.ImageLabel
 ]]
-function gifFrame.Show(self: GifFrame, parent: Frame)
+function gifFrame.Show(self: GifFrame, parent: GuiBase)
 	self.Image.Position = UDim2.fromScale(0, 0)
 	self.Image.Parent = parent
 end

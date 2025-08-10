@@ -1,3 +1,5 @@
+--!strict
+
 -- Services
 
 local ContentProvider = game:GetService("ContentProvider")
@@ -37,7 +39,7 @@ export type GifStruct = {
 	--[[
 		Gif surface
 	]]
-	Parent: Frame?,
+	Parent: GuiObject?,
 
 	--[[
 		Current frame num
@@ -52,7 +54,7 @@ export type GifStruct = {
 	--[[
 		Gif is looped
 
-		if true animation is will be looped.
+		if `true` animation is will be looped.
 	]]
 	LoopAnimation: boolean,
 
@@ -64,7 +66,7 @@ export type GifStruct = {
 	--[[
 		Fire where gif animation completed
 	]]
-	Completed: RBXScriptSignal,
+	Completed: RBXScriptSignal<>,
 
 	--[[
 		Fire where gif animation completed
@@ -74,7 +76,7 @@ export type GifStruct = {
 	--[[
 		Fire if gif destroying(Destroy called)
 	]]
-	Destroying: RBXScriptConnection,
+	Destroying: RBXScriptSignal<>,
 
 	--[[
 		Fire where Destroy call
@@ -84,7 +86,7 @@ export type GifStruct = {
 	--[[
 		Thread int that gif animation running
 	]]
-	AnimationThread: thread,
+	AnimationThread: thread?,
 
 	--[[
 		Gif mode. See gif.Mode
@@ -117,8 +119,6 @@ function gif.Destroy(self: Gif, notDestroyFrames: boolean?)
 
 	self.CompletedEvent:Destroy()
 	self.DestroyingEvent:Destroy()
-
-	table.clear(self)
 end
 
 --[[
@@ -126,7 +126,10 @@ end
 ]]
 function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
-		algorithm.copy_by_prop(self.Frames, "Image.Image"),
+		algorithm.copy_by_prop(
+			self.Frames :: gifFrame.GifFrameStruct,
+			"Image.Image"
+		),
 		function(assetId: string, assetFetchStatus: Enum.AssetFetchStatus)
 			if
 				assetFetchStatus == Enum.AssetFetchStatus.TimedOut
@@ -204,10 +207,10 @@ end
 	Stop gif animation
 ]]
 function gif.StopAnimation(self: Gif)
-	if self.AnimationRunning and self.AnimationThread then
+	if (self.AnimationRunning == true) and self.AnimationThread then
 		task.cancel(self.AnimationThread)
 		self.AnimationThread = nil
-	elseif self.AnimationRunning then
+	elseif self.AnimationRunning == true then
 		warn("StartAnimation not been done")
 	else
 		warn("Animation", self, "not been started yet")
@@ -333,7 +336,10 @@ end
 	Get total animation time
 ]]
 function gif.GetTotalAnimationTime(self: Gif): number
-	return algorithm.accumulate_by_prop(self.Frames, "Time")
+	return algorithm.accumulate_by_prop(
+		self.Frames :: gifFrame.GifFrameStruct,
+		"Time"
+	)
 end
 
 --[[
