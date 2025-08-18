@@ -1,3 +1,5 @@
+[![Lint](https://github.com/Ukuroks-games/giflib/actions/workflows/Lint.yaml/badge.svg)](https://github.com/Ukuroks-games/giflib/actions/workflows/Lint.yaml)
+
 # Giflib
 
 GifLib is a library for creating and using animations from images in Roblox (like gif files).
@@ -11,8 +13,8 @@ You can get [wally](https://github.com/upliftgames/wally) package.
 giflib = "egor00f/giflib@version"
 ```
 
-Or download rbxm from [releases](https://github.com/Ukuroks-games/giflib/releases). rbxm version contain all depends.
+Or download `rbxm` file from [releases](https://github.com/Ukuroks-games/giflib/releases). `rbxm` version contain all depends.
 
 ## Docs
 
-You can find docs in [wiki](https://github.com/Ukuroks-games/giflib/wiki/Guide)
+All about usage you can find docs in [wiki](https://github.com/Ukuroks-games/giflib/wiki/Guide)
