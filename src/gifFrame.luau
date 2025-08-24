@@ -23,6 +23,10 @@ local Gui = stdlib.utility.CreateOrFindInstance(
 	Players.LocalPlayer.PlayerGui
 )
 
+Gui.ResetOnSpawn = false
+Gui.IgnoreGuiInset = true
+
+
 --[[
 	gifFrame struct
 ]]
@@ -48,7 +52,7 @@ export type GifFrame = typeof(setmetatable(
 	Preload frame
 ]]
 function gifFrame.Preload(self: GifFrame)
-	ContentProvider:PreloadAsync({self.Image.Image})
+	ContentProvider:PreloadAsync({self.Image})
 end
 
 --[[
