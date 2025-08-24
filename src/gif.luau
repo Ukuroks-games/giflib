@@ -128,7 +128,7 @@ function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
 		algorithm.copy_by_prop(
 			self.Frames :: gifFrame.GifFrameStruct,
-			"Image.Image"
+			"Image"
 		),
 		function(assetId: string, assetFetchStatus: Enum.AssetFetchStatus)
 			if
