@@ -26,7 +26,6 @@ local Gui = stdlib.utility.CreateOrFindInstance(
 Gui.ResetOnSpawn = false
 Gui.IgnoreGuiInset = true
 
-
 --[[
 	gifFrame struct
 ]]
@@ -52,7 +51,7 @@ export type GifFrame = typeof(setmetatable(
 	Preload frame
 ]]
 function gifFrame.Preload(self: GifFrame)
-	ContentProvider:PreloadAsync({self.Image})
+	ContentProvider:PreloadAsync({ self.Image })
 end
 
 --[[
@@ -94,6 +93,32 @@ function gifFrame.Hide(self: GifFrame)
 	self.Image.Parent = Gui
 end
 
+local function SetUpSelf(self: GifFrameStruct): GifFrame
+	setmetatable(self, { __index = gifFrame })
+
+	self.Image.Size = UDim2.fromScale(1, 1)
+	self.Image.Position = UDim2.fromScale(1, 1)
+
+	return self
+end
+
+function gifFrame.SetTime(self: GifFrame, t: number)
+	self.Image:SetAttribute("Time", self.Time)
+	self.Time = t
+end
+
+--[[
+	Create frame from exist image
+]]
+function gifFrame.FromInstance(image: ImageLabel): GifFrame
+	local self: GifFrameStruct = {
+		Image = image,
+		Time = (image:GetAttribute("Time") :: number) or 0,
+	}
+
+	return SetUpSelf(self)
+end
+
 --[[
 	Gif frame constructor
 ]]
@@ -110,13 +135,9 @@ function gifFrame.new(id: string, t: number): GifFrame
 		Time = t,
 	}
 
-	setmetatable(self, { __index = gifFrame })
-
 	self.Image.Image = id
-	self.Image.Size = UDim2.fromScale(1, 1)
-	self.Image.Position = UDim2.fromScale(1, 1)
 
-	return self
+	return SetUpSelf(self)
 end
 
 return gifFrame
