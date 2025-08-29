@@ -92,6 +92,11 @@ export type GifStruct = {
 		Gif mode. See gif.Mode
 	]]
 	Mode: number,
+
+	--[[
+		animation speed
+	]]
+	Speed: number,
 }
 
 --[[
@@ -126,10 +131,7 @@ end
 ]]
 function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
-		algorithm.copy_by_prop(
-			self.Frames :: gifFrame.GifFrameStruct,
-			"Image"
-		),
+		algorithm.copy_by_prop(self.Frames :: gifFrame.GifFrameStruct, "Image"),
 		function(assetId: string, assetFetchStatus: Enum.AssetFetchStatus)
 			if
 				assetFetchStatus == Enum.AssetFetchStatus.TimedOut
@@ -174,7 +176,8 @@ function gif.AnimationLoop(self: Gif)
 
 		gif.Next(self)
 
-		local t = self.Frames[self.Frame].Time - (os.clock() - time)
+		local t = (self.Frames[self.Frame].Time / self.Speed)
+			- (os.clock() - time)
 
 		if t > 0 then
 			task.wait(t)
@@ -366,7 +369,8 @@ function gif.new(
 	parent: Frame?,
 	loopAnimation: boolean?,
 	ShowFirstFrameBeforeStart: boolean?,
-	mode: number?
+	mode: number?,
+	speed: number?
 ): Gif
 	local _CompletedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
@@ -384,6 +388,7 @@ function gif.new(
 		IsLoaded = false,
 		AnimationThread = nil,
 		Mode = mode or gif.Mode.Replace,
+		Speed = speed or 1,
 	}
 
 	setmetatable(self, { __index = gif })
