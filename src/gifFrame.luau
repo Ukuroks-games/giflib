@@ -1,5 +1,3 @@
---!strict
-
 -- Services
 
 local ContentProvider = game:GetService("ContentProvider")
@@ -93,6 +91,9 @@ function gifFrame.Hide(self: GifFrame)
 	self.Image.Parent = Gui
 end
 
+--[[
+	Set up self struct for it become `GifFrame`
+]]
 local function SetUpSelf(self: GifFrameStruct): GifFrame
 	setmetatable(self, { __index = gifFrame })
 
@@ -102,13 +103,16 @@ local function SetUpSelf(self: GifFrameStruct): GifFrame
 	return self
 end
 
+--[[
+	Set frame time
+]]
 function gifFrame.SetTime(self: GifFrame, t: number)
 	self.Image:SetAttribute("Time", self.Time)
 	self.Time = t
 end
 
 --[[
-	Create frame from exist image
+	Create frame from exist image.
 ]]
 function gifFrame.FromInstance(image: ImageLabel): GifFrame
 	local self: GifFrameStruct = {
@@ -121,6 +125,10 @@ end
 
 --[[
 	Gif frame constructor
+
+	`id` - image id
+
+	`t` - frame time
 ]]
 function gifFrame.new(id: string, t: number): GifFrame
 	if
