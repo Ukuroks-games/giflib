@@ -131,16 +131,7 @@ end
 ]]
 function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
-		algorithm.copy_by_prop(self.Frames :: gifFrame.GifFrameStruct, "Image"),
-		function(assetId: string, assetFetchStatus: Enum.AssetFetchStatus)
-			if
-				assetFetchStatus == Enum.AssetFetchStatus.TimedOut
-				or assetFetchStatus == Enum.AssetFetchStatus.Failure
-			then
-				print(assetFetchStatus)
-				warn(tostring(assetFetchStatus) .. " to load " .. assetId)
-			end
-		end
+		algorithm.copy_by_prop(self.Frames :: gifFrame.GifFrameStruct, "Image")
 	)
 
 	if
