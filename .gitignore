@@ -14,5 +14,9 @@ Packages/
 DevPackages/
 ServerPackages/
 
+package.json
+package-lock.json
+node_modules/
+
 build/
 giflib.zip
