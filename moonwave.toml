@@ -13,8 +13,8 @@ favicon = "no"
 # From git:
 organizationName = "Ukuroks Games"
 projectName = "Giflib"
-url = "https://Ukuroks-Games.github.io"
-baseUrl = "/Giflib"
+url = "https://ukuroks-games.github.io/"
+baseUrl = "/giflib"
 tagline = ""
 
 [footer]
