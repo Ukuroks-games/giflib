@@ -1,3 +1,5 @@
+--!strict
+
 -- Services
 
 local ContentProvider = game:GetService("ContentProvider")
@@ -24,20 +26,27 @@ local gif = {}
 	@tag enum
 ]=]
 gif.Mode = {
+	--[[
+		Next frame replace last frame
+	]]
 	Replace = 0,
+
+	--[[
+		The next layer is superimposed on the previous one
+	]]
 	Combine = 1,
 }
 
 export type GifStruct = {
 	--[[
-		Список кадров в гифке
+		List of gif frames
 	]]
 	Frames: { gifFrame.GifFrame },
 
 	--[[
 		Gif surface
 	]]
-	Parent: Frame?,
+	Parent: GuiObject?,
 
 	--[[
 		Current frame num
@@ -50,9 +59,9 @@ export type GifStruct = {
 	AnimationRunning: boolean,
 
 	--[[
-		Гифка зацикленна.
+		Gif is looped
 
-		if true animation is will be looped.
+		if `true` animation is will be looped.
 	]]
 	LoopAnimation: boolean,
 
@@ -62,9 +71,9 @@ export type GifStruct = {
 	IsLoaded: boolean,
 
 	--[[
-		Показывает что анимация завершилась
+		Fire where gif animation completed
 	]]
-	Completed: RBXScriptSignal,
+	Completed: RBXScriptSignal<>,
 
 	--[[
 		Fire where gif animation completed
@@ -74,7 +83,7 @@ export type GifStruct = {
 	--[[
 		Fire if gif destroying(Destroy called)
 	]]
-	Destroying: RBXScriptConnection,
+	Destroying: RBXScriptSignal<>,
 
 	--[[
 		Fire where Destroy call
@@ -84,12 +93,17 @@ export type GifStruct = {
 	--[[
 		Thread int that gif animation running
 	]]
-	AnimationThread: thread,
+	AnimationThread: thread?,
 
 	--[[
 		Gif mode. See gif.Mode
 	]]
 	Mode: number,
+
+	--[[
+		animation speed
+	]]
+	Speed: number,
 }
 
 --[=[
@@ -108,7 +122,8 @@ export type GifStruct = {
 
 	@within gif
 ]=]
-export type Gif = GifStruct & typeof(gif)
+export type Gif = typeof(setmetatable({} :: GifStruct, { __index = gif }))
+
 
 --[=[
 	Destroy gif
@@ -120,7 +135,7 @@ export type Gif = GifStruct & typeof(gif)
 
 	@within gif
 ]=]
-function gif.Destroy(self: GifStruct, notDestroyFrames: boolean?)
+function gif.Destroy(self: Gif, notDestroyFrames: boolean?)
 	self.DestroyingEvent:Fire()
 
 	-- Если анимация всё ещё запущенна
@@ -137,8 +152,6 @@ function gif.Destroy(self: GifStruct, notDestroyFrames: boolean?)
 
 	self.CompletedEvent:Destroy()
 	self.DestroyingEvent:Destroy()
-
-	table.clear(self)
 end
 
 --[=[
@@ -155,9 +168,9 @@ end
 
 	@yields
 ]=]
-function gif.Preload(self: GifStruct, skip: number? | boolean?)
+function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
-		algorithm.copy_by_prop(self.Frames, "Image.Image")
+		algorithm.copy_by_prop(self.Frames :: gifFrame.GifFrameStruct, "Image")
 	)
 
 	if
@@ -168,15 +181,39 @@ function gif.Preload(self: GifStruct, skip: number? | boolean?)
 			if typeof(skip) == "number" then
 				return skip
 			else
-				return 20
+				return 5
 			end
-		end)()
+		end)() / #self.Frames
+
 		for _, v in pairs(self.Frames) do
-			gifFrame.WaitLoading(v, delay / #self.Frames)
+			gifFrame.WaitLoading(v, delay)
 		end
 	end
 
 	self.IsLoaded = true
+end
+
+function gif.AnimationLoop(self: Gif)
+	while
+		(#self.Frames > self.Frame)
+		and (#self.Frames ~= 0)
+		and (self.AnimationRunning == true)
+	do
+		local time = os.clock()
+
+		gif.Next(self)
+
+		local t = (self.Frames[self.Frame].Time / self.Speed)
+			- (os.clock() - time)
+
+		if t > 0 then
+			task.wait(t)
+		end
+	end
+
+	self.AnimationRunning = false
+
+	self.CompletedEvent:Fire()
 end
 
 --[=[
@@ -191,7 +228,7 @@ end
 
 	@within gif
 ]=]
-function gif.StartAnimation(self: GifStruct, skip: number? | boolean?)
+function gif.StartAnimation(self: Gif, skip: number? | boolean?)
 	if self.AnimationRunning ~= true then
 		self.AnimationRunning = true
 
@@ -199,27 +236,7 @@ function gif.StartAnimation(self: GifStruct, skip: number? | boolean?)
 			gif.Preload(self, skip)
 		end
 
-		self.AnimationThread = task.spawn(function()
-			while
-				(#self.Frames > self.Frame)
-				and (#self.Frames ~= 0)
-				and (self.AnimationRunning == true)
-			do
-				local time = os.clock()
-
-				gif.Next(self)
-
-				local t = self.Frames[self.Frame].Time - (os.clock() - time)
-
-				if t > 0 then
-					task.wait(t)
-				end
-			end
-
-			self.AnimationRunning = false
-
-			self.CompletedEvent:Fire()
-		end)
+		self.AnimationThread = task.spawn(gif.AnimationLoop, self)
 	else
 		warn("Animation already running")
 	end
@@ -233,12 +250,13 @@ end
 	@method StopAnimation
 
 	@within gif
-]=]
-function gif.StopAnimation(self: GifStruct)
-	if self.AnimationRunning and self.AnimationThread then
+
+function gif.StopAnimation(self: Gif)
+	if (self.AnimationRunning == true) and self.AnimationThread then
+
 		task.cancel(self.AnimationThread)
 		self.AnimationThread = nil
-	elseif self.AnimationRunning then
+	elseif self.AnimationRunning == true then
 		warn("StartAnimation not been done")
 	else
 		warn("Animation", self, "not been started yet")
@@ -257,13 +275,15 @@ end
 
 	@within gif
 ]=]
-function gif.SetFrame(self: GifStruct, frame: number)
-	if self.Parent then
+function gif.SetFrame(self: Gif, frame: number)
+	if self.Parent and self.Frames[frame] then
 		gifFrame.Show(self.Frames[frame], self.Parent)
 
 		if self.Frame ~= 0 and self.Mode == gif.Mode.Replace then
 			gifFrame.Hide(self.Frames[self.Frame]) -- hide last frame
 		end
+	else
+		warn("Parent or self.Frames[" .. frame .. "] not exist")
 	end
 
 	self.Frame = frame
@@ -280,7 +300,7 @@ end
 
 	@within gif
 ]=]
-function gif.ResetAnimation(self: GifStruct)
+function gif.ResetAnimation(self: Gif)
 	self.Frame = 0
 
 	if self.Mode == gif.Mode.Combine then
@@ -301,7 +321,8 @@ end
 
 	@since v0.3.2
 ]=]
-function gif.RestartAnimation(self: GifStruct, skip: number? | boolean?)
+function gif.RestartAnimation(self: Gif, skip: number? | boolean?)
+
 	gif.ResetAnimation(self)
 	gif.StartAnimation(self, skip)
 end
@@ -315,7 +336,7 @@ end
 
 	@within gif
 ]=]
-function gif.Next(self: GifStruct)
+function gif.Next(self: Gif)
 	gif.SetFrame(self, self.Frame + 1)
 end
 
@@ -330,7 +351,8 @@ end
 
 	@since v0.1.8
 ]=]
-function gif.Hide(self: GifStruct)
+function gif.Hide(self: Gif)
+
 	for _, v in pairs(self.Frames) do
 		gifFrame.Hide(v)
 	end
@@ -348,13 +370,16 @@ end
 
 	@since v0.1.8
 ]=]
-function gif.SetBackgroundTransparency(self: GifStruct, newTransparency: number)
+function gif.SetBackgroundTransparency(self: Gif, newTransparency: number)
+
 	if self.Mode == gif.Mode.Combine then
 		self.Frames[1].Image.BackgroundTransparency = newTransparency
-	else
+	elseif self.Mode == gif.Mode.Replace then
 		for _, v in pairs(self.Frames) do
 			v.Image.BackgroundTransparency = newTransparency
 		end
+	else
+		warn("unknown mode" .. tostring(self.Mode))
 	end
 end
 
@@ -369,7 +394,7 @@ end
 
 	@since v0.1.8
 ]=]
-function gif.SetBackgroundColor(self: GifStruct, newColor: Color3)
+function gif.SetBackgroundColor(self: Gif, newColor: Color3)
 	for _, v in pairs(self.Frames) do
 		v.Image.BackgroundColor3 = newColor
 	end
@@ -388,7 +413,7 @@ end
 
 	@since v0.1.8
 ]=]
-function gif.SetTransparency(self: GifStruct, newTransparency: number)
+function gif.SetTransparency(self: Gif, newTransparency: number)
 	for _, v in pairs(self.Frames) do
 		v.Image.ImageTransparency = newTransparency
 	end
@@ -406,7 +431,7 @@ end
 
 	@since v0.1.8
 ]=]
-function gif.SetScaleType(self: GifStruct, scaleType: Enum.ScaleType)
+function gif.SetScaleType(self: Gif, scaleType: Enum.ScaleType)
 	for _, v in pairs(self.Frames) do
 		v.Image.ScaleType = scaleType
 	end
@@ -422,7 +447,8 @@ end
 
 	@within gif
 ]=]
-function gif.SetResampleMode(self: GifStruct, resampleMode: Enum.ResamplerMode)
+function gif.SetResampleMode(self: Gif, resampleMode: Enum.ResamplerMode)
+
 	for _, v in pairs(self.Frames) do
 		v.Image.ResampleMode = resampleMode
 	end
@@ -437,7 +463,8 @@ end
 	@method SetParent
 	@within gif
 ]=]
-function gif.SetParent(self: GifStruct, newParent: Frame?)
+function gif.SetParent(self: Gif, newParent: Frame?)
+
 	self.Parent = newParent
 	self.Frames[self.Frame].Image.Parent = newParent
 end
@@ -452,8 +479,11 @@ end
 
 	@since v0.3.1
 ]=]
-function gif.GetTotalAnimationTime(self: GifStruct): number
-	return algorithm.accumulate_by_prop(self.Frames, "Time")
+function gif.GetTotalAnimationTime(self: Gif): number
+	return algorithm.accumulate_by_prop(
+		self.Frames :: gifFrame.GifFrameStruct,
+		"Time"
+	)
 end
 
 --[=[
@@ -467,7 +497,7 @@ end
 
 	@since v0.3.1
 ]=]
-function gif.AddFrame(self: GifStruct, frame: gifFrame.GifFrame)
+function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 	self.IsLoaded = self.IsLoaded and frame.Image.IsLoaded
 	table.insert(self.Frames, frame)
 end
@@ -478,8 +508,8 @@ end
 	@function new
 	
 	@param frames	{ [number]: GifFrame }?	-- list of frames
-	@param parent	{ Frame }?
-	@param loopAnimation boolean? --[[ animation is looped ]]
+	@param parent	{ Frame }?  -- gif surface. Parent for all frames
+	@param loopAnimation boolean? -- animation is looped 
 	@param ShowFirstFrameBeforeStart boolean?	-- is true first frame will showing before gif.StartAnimation call.
 	@param mode number?
 
@@ -492,7 +522,8 @@ function gif.new(
 	parent: Frame?,
 	loopAnimation: boolean?,
 	ShowFirstFrameBeforeStart: boolean?,
-	mode: number?
+	mode: number?,
+	speed: number?
 ): Gif
 	local _CompletedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
@@ -510,7 +541,10 @@ function gif.new(
 		IsLoaded = false,
 		AnimationThread = nil,
 		Mode = mode or gif.Mode.Replace,
+		Speed = speed or 1,
 	}
+
+	setmetatable(self, { __index = gif })
 
 	gif.Hide(self)
 
@@ -535,8 +569,6 @@ function gif.new(
 			gif.StopAnimation(self)
 		end
 	end)
-
-	setmetatable(self, { __index = gif })
 
 	return self
 end

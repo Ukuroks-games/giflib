@@ -37,6 +37,7 @@ mygif:SetResampleMode(Enum.ResamplerMode.Pixelated)
 mygif:SetScaleType(Enum.ScaleType.Fit)
 mygif:SetBackgroundTransparency(1)
 
+print("Start")
 mygif:StartAnimation(true) -- without wait loading
 
 wait(10)

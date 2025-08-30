@@ -3,31 +3,32 @@
 local ContentProvider = game:GetService("ContentProvider")
 local Players = game:GetService("Players")
 
---[=[
-	@class gifFrame
 
+
+-- Libraries
+
+local stdlib = require(script.Parent.Parent.stdlib)
+
+--[=[
 	Gif frame class
+
+	@class gifFrame
 
 	@client
 ]=]
 local gifFrame = {}
 
-local function CreateGui(name: string): Instance
-	local a = Players.LocalPlayer.PlayerGui:FindFirstChild(name)
-
-	if not a then
-		a = Instance.new("ScreenGui")
-		a.Parent = Players.LocalPlayer.PlayerGui
-		a.Name = name
-	end
-
-	return a
-end
-
 --[[
 	Gui for preloading a images
 ]]
-local Gui = CreateGui("GifPreloadGui")
+local Gui = stdlib.utility.CreateOrFindInstance(
+	"GifPreloadGui",
+	"ScreenGui",
+	Players.LocalPlayer.PlayerGui
+)
+
+Gui.ResetOnSpawn = false
+Gui.IgnoreGuiInset = true
 
 --[[
 	@type GifFrameStruct 
@@ -47,7 +48,10 @@ export type GifFrameStruct = {
 	Time: number,
 }
 
-export type GifFrame = GifFrameStruct & typeof(gifFrame)
+export type GifFrame = typeof(setmetatable(
+	{} :: GifFrameStruct,
+	{ __index = gifFrame }
+))
 
 --[=[
 	Preload frame
@@ -59,7 +63,7 @@ export type GifFrame = GifFrameStruct & typeof(gifFrame)
 	@within gifFrame
 ]=]
 function gifFrame.Preload(self: GifFrame)
-	ContentProvider:PreloadAsync(self.Image.Image)
+	ContentProvider:PreloadAsync({ self.Image })
 end
 
 --[=[
@@ -104,7 +108,8 @@ end
 	@method Show
 	@within gifFrame
 ]=]
-function gifFrame.Show(self: GifFrame, parent: Frame)
+function gifFrame.Show(self: GifFrame, parent: GuiBase)
+
 	self.Image.Position = UDim2.fromScale(0, 0)
 	self.Image.Parent = parent
 end
@@ -120,6 +125,39 @@ end
 function gifFrame.Hide(self: GifFrame)
 	self.Image.Position = UDim2.fromScale(1, 1)
 	self.Image.Parent = Gui
+end
+
+
+--[[
+	Set up self struct for it become `GifFrame`
+]]
+local function SetUpSelf(self: GifFrameStruct): GifFrame
+	setmetatable(self, { __index = gifFrame })
+
+	self.Image.Size = UDim2.fromScale(1, 1)
+	self.Image.Position = UDim2.fromScale(1, 1)
+
+	return self
+end
+
+--[[
+	Set frame time
+]]
+function gifFrame.SetTime(self: GifFrame, t: number)
+	self.Image:SetAttribute("Time", self.Time)
+	self.Time = t
+end
+
+--[[
+	Create frame from exist image.
+]]
+function gifFrame.FromInstance(image: ImageLabel): GifFrame
+	local self: GifFrameStruct = {
+		Image = image,
+		Time = (image:GetAttribute("Time") :: number) or 0,
+	}
+
+	return SetUpSelf(self)
 end
 
 --[=[
@@ -147,13 +185,9 @@ function gifFrame.new(id: string, t: number): GifFrame
 		Time = t,
 	}
 
-	setmetatable(self, { __index = gifFrame })
-
 	self.Image.Image = id
-	self.Image.Size = UDim2.fromScale(1, 1)
-	self.Image.Position = UDim2.fromScale(1, 1)
 
-	return self
+	return SetUpSelf(self)
 end
 
 return gifFrame

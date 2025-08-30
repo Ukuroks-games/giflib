@@ -1,25 +1,26 @@
 {
 	"editor.insertSpaces": false,
 	"editor.defaultFormatter": "JohnnyMorganz.stylua",
-	
 	"cSpell.enabled": true,
 	"cSpell.words": [
+		"gif",
 		"Giflib",
+		"rbxassetid",
 		"rbxl",
 		"rbxm",
 		"Resampler",
 		"Roblox",
 		"rojo",
-		"setmetatable"
+		"setmetatable",
+		"stdlib",
+		"tostring"
 	],
-
 	"cSpell.ignorePaths": [
 		".git/objects",
-		".vscode",	// ignore vscode workspace settings
+		".vscode", // ignore vscode workspace settings
 		".vscode-insiders",
-		"*.toml"	// ignore toml files
+		"*.toml" // ignore toml files
 	],
-
 	"luau-lsp.sourcemap.rojoProjectFile": "tests.project.json",
 	"luau-lsp.platform.type": "roblox",
 	"luau-lsp.sourcemap.generatorCommand": "make sourcemap",
