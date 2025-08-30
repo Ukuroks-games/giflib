@@ -9,7 +9,7 @@ ifeq ($(OS),Windows_NT)
 else
 	CP = cp -rf
 	MV = mv -f
-	RM = rm -rf
+	RM = -rf
 endif
 
 BUILD_DIR = build
@@ -28,11 +28,20 @@ $(BUILD_DIR):
 ./Packages: wally.toml
 	wally install
 
+NPM_ROOT = $(shell npm root)
 
+$(NPM_ROOT)/.bin/moonwave:
+	npm i moonwave@latest
+
+
+$(BUILD_DIR)/html: $(NPM_ROOT)/.bin/moonwave moonwave.toml $(SOURCES)
+	$(NPM_ROOT)/.bin/moonwave build --out-dir $@
+
+docs: $(BUILD_DIR)/html
 
 configure: clean-build $(BUILD_DIR) wally.toml $(SOURCES)
 	$(CP) src/* $(BUILD_DIR)
-	$(CP) wally.toml build/
+	$(CP) wally.toml $(BUILD_DIR)/
 
 package: configure $(SOURCES)
 	wally package --output $(PACKAGE_NAME) --project-path $(BUILD_DIR)
