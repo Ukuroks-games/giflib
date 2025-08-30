@@ -5,6 +5,8 @@ gitSourceBranch = "master"
 changelog = true
 classOrder = []
 
+includeReadme = true
+
 [docusaurus]
 onBrokenLinks = "throw"
 onBrokenMarkdownLinks = "warn"

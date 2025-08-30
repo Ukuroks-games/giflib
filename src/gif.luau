@@ -521,7 +521,7 @@ end
 	@param ShowFirstFrameBeforeStart boolean?	-- is true first frame will showing before gif.StartAnimation call.
 	@param mode number?
 
-	@return Gif
+	@return Gif -- created gif
 
 	@within gif
 ]=]

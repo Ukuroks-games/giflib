@@ -1,3 +1,16 @@
+---
+sidebar_position: 1
+---
+
+
+# Getting started with Giflib
+
+For more details read [API](https://ukuroks-games.github.io/giflib/api/).
+
+## Basic usage
+
+just small example:
+```lua
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -6,7 +19,7 @@ local giflib = require(ReplicatedStorage.Packages.giflib)
 local imageLabel = Instance.new("Frame")
 
 imageLabel.Parent = Players.LocalPlayer.PlayerGui:WaitForChild("ScreenGui")
-imageLabel.Size = UDim2.fromScale(1, 0.5)
+imageLabel.Size = UDim2.fromScale(1, 1)
 
 local myGif = giflib.gif.new(
 	{
@@ -24,8 +37,8 @@ local myGif = giflib.gif.new(
 		giflib.Frame.new("73999504428848", 1),
 	},
 	imageLabel,
-	true, -- animation is looped
-	true -- show first frame before animation loaded
+	true,	-- animation is looped
+	true	-- show first frame before animation loaded
 )
 
 print("Total myGif animation time", myGif:GetTotalAnimationTime(), "sec")
@@ -45,9 +58,11 @@ wait(10)
 print("Start")
 myGif:StartAnimation()
 
+
 wait(10)
 print("Set to Pixelated")
-myGif:SetResampleMode(Enum.ResamplerMode.Pixelated)
+myGif:SetResampleMode(Enum.ResampleMode.Pixelated)
+
 
 wait(10)
 print("Set fit scale type")
@@ -57,6 +72,7 @@ wait(10)
 print("Speed x4")
 myGif.Speed = 4
 
+
 wait(10)
 print("Speed x0.25")
 myGif.Speed = 0.25
@@ -64,3 +80,5 @@ myGif.Speed = 0.25
 wait(10)
 print("Destroy")
 myGif:Destroy()
+
+```
