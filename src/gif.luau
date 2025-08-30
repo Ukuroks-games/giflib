@@ -193,6 +193,14 @@ function gif.Preload(self: Gif, skip: number? | boolean?)
 	self.IsLoaded = true
 end
 
+--[=[
+	Main animation loop
+
+	@param self gif
+
+	@method AnimationLoop
+	@within gif
+]=]
 function gif.AnimationLoop(self: Gif)
 	while
 		(#self.Frames > self.Frame)
@@ -250,7 +258,7 @@ end
 	@method StopAnimation
 
 	@within gif
-
+]=]
 function gif.StopAnimation(self: Gif)
 	if (self.AnimationRunning == true) and self.AnimationThread then
 

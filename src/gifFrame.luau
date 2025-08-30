@@ -3,8 +3,6 @@
 local ContentProvider = game:GetService("ContentProvider")
 local Players = game:GetService("Players")
 
-
-
 -- Libraries
 
 local stdlib = require(script.Parent.Parent.stdlib)
@@ -109,7 +107,6 @@ end
 	@within gifFrame
 ]=]
 function gifFrame.Show(self: GifFrame, parent: GuiBase)
-
 	self.Image.Position = UDim2.fromScale(0, 0)
 	self.Image.Parent = parent
 end
@@ -126,7 +123,6 @@ function gifFrame.Hide(self: GifFrame)
 	self.Image.Position = UDim2.fromScale(1, 1)
 	self.Image.Parent = Gui
 end
-
 
 --[[
 	Set up self struct for it become `GifFrame`
@@ -148,9 +144,16 @@ function gifFrame.SetTime(self: GifFrame, t: number)
 	self.Time = t
 end
 
---[[
+--[=[
 	Create frame from exist image.
-]]
+
+	@function FromInstance
+
+	@param image ImageLabel -- image label with attribute "Time" and type number
+	@return gifFrame
+
+	@within gifFrame
+]=]
 function gifFrame.FromInstance(image: ImageLabel): GifFrame
 	local self: GifFrameStruct = {
 		Image = image,
