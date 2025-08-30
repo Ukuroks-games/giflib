@@ -1,10 +1,11 @@
-name: Lint
+name: Publish docs
 
 on:
   push:
     paths:
       - 'src/**'
       - 'docs/**'
+      - '.github/workflows/publish-docs.yaml'
     branches:
       - main
 
