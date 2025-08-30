@@ -7,9 +7,13 @@ local Players = game:GetService("Players")
 
 local stdlib = require(script.Parent.Parent.stdlib)
 
---[[
+--[=[
 	Gif frame class
-]]
+
+	@class gifFrame
+
+	@client
+]=]
 local gifFrame = {}
 
 --[[
@@ -25,18 +29,20 @@ Gui.ResetOnSpawn = false
 Gui.IgnoreGuiInset = true
 
 --[[
-	gifFrame struct
+	@type GifFrameStruct 
+
+	@within gifFrame
 ]]
 export type GifFrameStruct = {
 
-	--[[
+	--[=[
 		Label with image
-	]]
+	]=]
 	Image: ImageLabel,
 
-	--[[
+	--[=[
 		delay on this image
-	]]
+	]=]
 	Time: number,
 }
 
@@ -45,16 +51,28 @@ export type GifFrame = typeof(setmetatable(
 	{ __index = gifFrame }
 ))
 
---[[
+--[=[
 	Preload frame
-]]
+
+	@param self gifFrame
+
+	@method Preload
+
+	@within gifFrame
+]=]
 function gifFrame.Preload(self: GifFrame)
 	ContentProvider:PreloadAsync({ self.Image })
 end
 
---[[
+--[=[
 	Wait image loading
-]]
+
+	@param self gifFrame
+	@param skipDelay number?
+
+	@method WaitLoading
+	@within gifFrame
+]=]
 function gifFrame.WaitLoading(self: GifFrame, skipDelay: number?)
 	local t = os.clock()
 	while not self.Image.IsLoaded do
@@ -66,26 +84,41 @@ function gifFrame.WaitLoading(self: GifFrame, skipDelay: number?)
 	end
 end
 
---[[
+--[=[
 	Destroy gif frame
-]]
+
+	@param self gifFrame
+
+
+	@method Destroy
+	@within gifFrame
+]=]
 function gifFrame.Destroy(self: GifFrame)
 	self.Image:Destroy()
 end
 
---[[
+--[=[
 	Show frame.
 
-	`parent` is Gif.ImageLabel
-]]
+	@param self gifFrame
+	@param parent Frame -- is Gif.ImageLabel
+
+	@method Show
+	@within gifFrame
+]=]
 function gifFrame.Show(self: GifFrame, parent: GuiBase)
 	self.Image.Position = UDim2.fromScale(0, 0)
 	self.Image.Parent = parent
 end
 
---[[
+--[=[
 	Hide frame
-]]
+
+	@param self gifFrame
+	
+	@method Hide
+	@within gifFrame
+]=]
 function gifFrame.Hide(self: GifFrame)
 	self.Image.Position = UDim2.fromScale(1, 1)
 	self.Image.Parent = Gui
@@ -111,9 +144,16 @@ function gifFrame.SetTime(self: GifFrame, t: number)
 	self.Time = t
 end
 
---[[
+--[=[
 	Create frame from exist image.
-]]
+
+	@function FromInstance
+
+	@param image ImageLabel -- image label with attribute "Time" and type number
+	@return gifFrame
+
+	@within gifFrame
+]=]
 function gifFrame.FromInstance(image: ImageLabel): GifFrame
 	local self: GifFrameStruct = {
 		Image = image,
@@ -123,13 +163,18 @@ function gifFrame.FromInstance(image: ImageLabel): GifFrame
 	return SetUpSelf(self)
 end
 
---[[
+--[=[
 	Gif frame constructor
 
-	`id` - image id
+	@function new
 
-	`t` - frame time
-]]
+	@param id string -- asset id of frame
+	@param t number -- frame time
+
+	@return gifFrame
+
+	@within gifFrame
+]=]
 function gifFrame.new(id: string, t: number): GifFrame
 	if
 		(not id:find("http://www.roblox.com/asset/?id="))

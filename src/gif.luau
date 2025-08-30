@@ -10,14 +10,21 @@ local algorithm = require(script.Parent.Parent.stdlib).algorithm
 
 local gifFrame = require(script.Parent.gifFrame)
 
---[[
-	# Library for creating gif
-]]
+--[=[
+	@class gif
+
+	@client
+]=]
 local gif = {}
 
---[[
-	Gif mode
-]]
+--[=[
+	Enum of gif modes
+
+	@prop Mode { Replace: 1, Combine: 2 }
+
+	@within gif
+	@tag enum
+]=]
 gif.Mode = {
 	--[[
 		Next frame replace last frame
@@ -99,14 +106,35 @@ export type GifStruct = {
 	Speed: number,
 }
 
---[[
-	Gif struct
-]]
+--[=[
+	@interface Gif
+
+	@field Frames { gifFrame }
+	@field Parent Frame?
+	@field Frame number
+	@field AnimationRunning boolean
+	@field LoopAnimation boolean
+	@field IsLoaded boolean
+	@field Completed RBXScriptConnection
+	@field Destroying RBXScriptConnection
+	@field AnimationThread thread
+	@field Mode Mode
+
+	@within gif
+]=]
 export type Gif = typeof(setmetatable({} :: GifStruct, { __index = gif }))
 
---[[
+
+--[=[
 	Destroy gif
-]]
+	
+	@param self GifStruct  -- 
+	@param notDestroyFrames boolean -- if you need to not destroy frames
+
+	@method Destroy
+
+	@within gif
+]=]
 function gif.Destroy(self: Gif, notDestroyFrames: boolean?)
 	self.DestroyingEvent:Fire()
 
@@ -126,9 +154,20 @@ function gif.Destroy(self: Gif, notDestroyFrames: boolean?)
 	self.DestroyingEvent:Destroy()
 end
 
---[[
+--[=[
 	Wait all image loading
-]]
+
+	You should always preload gif before start it, otherwise you can notice the passes of personnel and flickering
+
+	@param self gif
+	@param skip number?|boolean	-- skip preload. max delay in sec or boolean
+
+	@method Preload
+
+	@within gif
+
+	@yields
+]=]
 function gif.Preload(self: Gif, skip: number? | boolean?)
 	ContentProvider:PreloadAsync(
 		algorithm.copy_by_prop(self.Frames :: gifFrame.GifFrameStruct, "Image")
@@ -154,9 +193,14 @@ function gif.Preload(self: Gif, skip: number? | boolean?)
 	self.IsLoaded = true
 end
 
---[[
+--[=[
 	Main animation loop
-]]
+
+	@param self gif
+
+	@method AnimationLoop
+	@within gif
+]=]
 function gif.AnimationLoop(self: Gif)
 	while
 		(#self.Frames > self.Frame)
@@ -180,9 +224,18 @@ function gif.AnimationLoop(self: Gif)
 	self.CompletedEvent:Fire()
 end
 
---[[
-	Start gif animation
-]]
+--[=[
+	Start gif animation. 
+
+	If gif not been preloaded yet thins function will run [`gif:Preload`](#Preload) (you can skip that if you set arg noWaitPreload to true).
+
+	@param self gif
+	@param skip number?|boolean	-- skip preload. max delay in sec or boolean
+
+	@method StartAnimation
+
+	@within gif
+]=]
 function gif.StartAnimation(self: Gif, skip: number? | boolean?)
 	if self.AnimationRunning ~= true then
 		self.AnimationRunning = true
@@ -197,11 +250,18 @@ function gif.StartAnimation(self: Gif, skip: number? | boolean?)
 	end
 end
 
---[[
+--[=[
 	Stop gif animation
-]]
+
+	@param self gif
+
+	@method StopAnimation
+
+	@within gif
+]=]
 function gif.StopAnimation(self: Gif)
 	if (self.AnimationRunning == true) and self.AnimationThread then
+
 		task.cancel(self.AnimationThread)
 		self.AnimationThread = nil
 	elseif self.AnimationRunning == true then
@@ -213,9 +273,16 @@ function gif.StopAnimation(self: Gif)
 	self.AnimationRunning = false
 end
 
---[[
+--[=[
 	Set current frame, that showing now
-]]
+
+	@param self gif
+	@param frame number -- index of frame
+
+	@method SetFrame
+
+	@within gif
+]=]
 function gif.SetFrame(self: Gif, frame: number)
 	if self.Parent and self.Frames[frame] then
 		gifFrame.Show(self.Frames[frame], self.Parent)
@@ -230,9 +297,17 @@ function gif.SetFrame(self: Gif, frame: number)
 	self.Frame = frame
 end
 
---[[
-	Reset animation.
-]]
+--[=[
+	Reset animation. 
+	
+	Don't stopping animation
+
+	@param self gif
+
+	@method ResetAnimation
+
+	@within gif
+]=]
 function gif.ResetAnimation(self: Gif)
 	self.Frame = 0
 
@@ -241,34 +316,70 @@ function gif.ResetAnimation(self: Gif)
 	end
 end
 
---[[
+--[=[
 	Restart animation
-]]
+
+	@param self gif
+	@param skip number?|boolean	-- skip preload. max delay in sec or boolean
+
+	@method RestartAnimation
+
+	@within gif
+
+
+	@since v0.3.2
+]=]
 function gif.RestartAnimation(self: Gif, skip: number? | boolean?)
+
 	gif.ResetAnimation(self)
 	gif.StartAnimation(self, skip)
 end
 
---[[
+--[=[
 	Next frame
-]]
+
+	@param self gif
+
+	@method Next
+
+	@within gif
+]=]
 function gif.Next(self: Gif)
 	gif.SetFrame(self, self.Frame + 1)
 end
 
---[[
+--[=[
 	Hide gif frames
-]]
+
+	@param self gif
+
+	@method Hide
+
+	@within gif
+
+	@since v0.1.8
+]=]
 function gif.Hide(self: Gif)
+
 	for _, v in pairs(self.Frames) do
 		gifFrame.Hide(v)
 	end
 end
 
---[[
+--[=[
 	Set frames background transparency
-]]
+
+	@param self gif
+	@param newTransparency number
+
+	@method SetBackgroundTransparency
+	@within gif
+
+
+	@since v0.1.8
+]=]
 function gif.SetBackgroundTransparency(self: Gif, newTransparency: number)
+
 	if self.Mode == gif.Mode.Combine then
 		self.Frames[1].Image.BackgroundTransparency = newTransparency
 	elseif self.Mode == gif.Mode.Replace then
@@ -280,55 +391,102 @@ function gif.SetBackgroundTransparency(self: Gif, newTransparency: number)
 	end
 end
 
---[[
+--[=[
 	Set frames background color
-]]
+
+	@param self gif
+	@param newColor Color3
+
+	@method SetBackgroundColor
+	@within gif
+
+	@since v0.1.8
+]=]
 function gif.SetBackgroundColor(self: Gif, newColor: Color3)
 	for _, v in pairs(self.Frames) do
 		v.Image.BackgroundColor3 = newColor
 	end
 end
 
---[[
+--[=[
 	Set images transparency
 
-	You shouldn't use this function with Combine mode.
-]]
+	not working normally with combine mode
+
+	@param self gif
+	@param newTransparency number
+
+	@method SetTransparency
+	@within gif
+
+	@since v0.1.8
+]=]
 function gif.SetTransparency(self: Gif, newTransparency: number)
 	for _, v in pairs(self.Frames) do
 		v.Image.ImageTransparency = newTransparency
 	end
 end
 
---[[
+--[=[
 	Set scale type
-]]
+
+	@param self gif
+	@param scaleType ScaleType
+
+	@method SetScaleType
+	@within gif
+
+
+	@since v0.1.8
+]=]
 function gif.SetScaleType(self: Gif, scaleType: Enum.ScaleType)
 	for _, v in pairs(self.Frames) do
 		v.Image.ScaleType = scaleType
 	end
 end
 
---[[
+--[=[
 	Set resample mode
-]]
+
+	@param self gif
+	@param resampleMode ResamplerMode
+
+	@method SetResampleMode
+
+	@within gif
+]=]
 function gif.SetResampleMode(self: Gif, resampleMode: Enum.ResamplerMode)
+
 	for _, v in pairs(self.Frames) do
 		v.Image.ResampleMode = resampleMode
 	end
 end
 
---[[
+--[=[
 	Set gif parent
-]]
+
+	@param self gif
+	@param newParent Frame?
+
+	@method SetParent
+	@within gif
+]=]
 function gif.SetParent(self: Gif, newParent: Frame?)
+
 	self.Parent = newParent
 	self.Frames[self.Frame].Image.Parent = newParent
 end
 
---[[
+--[=[
 	Get total animation time
-]]
+
+	@method GetTotalAnimationTime
+
+	@within gif
+
+
+	@since v0.3.1
+]=]
 function gif.GetTotalAnimationTime(self: Gif): number
 	return algorithm.accumulate_by_prop(
 		self.Frames :: gifFrame.GifFrameStruct,
@@ -336,25 +494,37 @@ function gif.GetTotalAnimationTime(self: Gif): number
 	)
 end
 
---[[
-	Add frame
-]]
+--[=[
+	Add new frame 
+
+	@param self gif
+	@param frame gifFrame
+
+	@method AddFrame
+	@within gif
+
+	@since v0.3.1
+]=]
 function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 	self.IsLoaded = self.IsLoaded and frame.Image.IsLoaded
 	table.insert(self.Frames, frame)
 end
 
---[[
+--[=[
 	Gif constructor
 
-	`frames` - list of `GifFrame`s
+	@function new
+	
+	@param frames	{ [number]: GifFrame }?	-- list of frames
+	@param parent	{ Frame }?  -- gif surface. Parent for all frames
+	@param loopAnimation boolean? -- animation is looped 
+	@param ShowFirstFrameBeforeStart boolean?	-- is true first frame will showing before gif.StartAnimation call.
+	@param mode number?
 
-	`parent` - gif surface. Parent for all frames
+	@return Gif
 
-	`loopAnimation` - if true animation is will be looped
-
-	`ShowFirstFrameBeforeLoading` - Show the first frame before animation start
-]]
+	@within gif
+]=]
 function gif.new(
 	frames: { [number]: gifFrame.GifFrame }?,
 	parent: Frame?,
