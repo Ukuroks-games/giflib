@@ -175,14 +175,13 @@ end
 	@yields
 ]=]
 function gif.Preload(self: Gif, skip: number? | boolean?)
-	ContentProvider:PreloadAsync(
-		algorithm.copy_by_prop(self.Frames :: gifFrame.GifFrameStruct, "Image")
-	)
-
 	if
 		(typeof(skip) == "boolean" and skip ~= true)
 		or (typeof(skip) == "number")
 	then
+		ContentProvider:PreloadAsync(
+			algorithm.copy_by_prop(self.Frames :: gifFrame.GifFrameStruct, "Image")
+		)
 		local delay = (function()
 			if typeof(skip) == "number" then
 				return skip
@@ -522,6 +521,12 @@ end
 function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 	self.IsLoaded = self.IsLoaded and frame.Image.IsLoaded
 	table.insert(self.Frames, frame)
+end
+
+function gif.Free(self: Gif)
+	for _, v in pairs(self.Frames) do
+		v:Free()
+	end
 end
 
 --[=[

@@ -112,12 +112,13 @@ end
 	@within gifFrame
 ]=]
 function gifFrame.Show(self: GifFrame, parent: GuiBase)
+	self.Image.Visible = true
 	self.Image.Size = UDim2.fromScale(1,1)
 	self.Image.Parent = parent
 end
 
 --[=[
-	Hide frame
+	Hide frame. Keep image in memory
 
 	@param self gifFrame
 	
@@ -127,6 +128,17 @@ end
 function gifFrame.Hide(self: GifFrame)
 	self.Image.Size = UDim2.new()
 	self.Image.Parent = Gui
+end
+
+--[=[
+	don't keep image in memory
+
+	@param self gifFrame
+
+	@since v0.4.0
+]=]
+function gifFrame.Free(self: GifFrame)
+	self.Image.Visible = false
 end
 
 --[[

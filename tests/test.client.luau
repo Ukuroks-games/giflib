@@ -62,5 +62,9 @@ print("Speed x0.25")
 myGif.Speed = 0.25
 
 wait(10)
+print("Free")
+myGif:Free()
+
+wait(10)
 print("Destroy")
 myGif:Destroy()
