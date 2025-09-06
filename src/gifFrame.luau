@@ -135,6 +135,9 @@ end
 
 	@param self gifFrame
 
+	@method Free
+	@within gifFrame
+
 	@since v0.4.0
 ]=]
 function gifFrame.Free(self: GifFrame)
@@ -170,6 +173,8 @@ end
 	@return gifFrame
 
 	@within gifFrame
+
+	@since v0.4.0
 ]=]
 function gifFrame.FromInstance(image: ImageLabel): GifFrame
 	local self: GifFrameStruct = {

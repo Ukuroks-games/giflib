@@ -523,6 +523,16 @@ function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 	table.insert(self.Frames, frame)
 end
 
+--[=[
+	Don't keep images in memory
+
+	@param self gif
+
+	@method Free
+	@within gif
+
+	@since v0.4.0
+]=]
 function gif.Free(self: Gif)
 	for _, v in pairs(self.Frames) do
 		v:Free()
