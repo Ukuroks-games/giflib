@@ -26,12 +26,12 @@ lint:
 	selene src/ tests/
 
 include Makefiles/docs.mk
-include Makefiles/package.mk
 include Makefiles/rbxm.mk
 include Makefiles/sources.mk
 include Makefiles/tests.mk
 include Makefiles/sourcemap.mk
 include Makefiles/clean.mk
+include Makefiles/package.mk
 	
 aftman-install: aftman.toml
 	aftman install
