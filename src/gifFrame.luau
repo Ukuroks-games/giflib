@@ -59,6 +59,7 @@ export type GifFrame = typeof(setmetatable(
 	@method Preload
 
 	@within gifFrame
+	@yields
 ]=]
 function gifFrame.Preload(self: GifFrame)
 	ContentProvider:PreloadAsync({ self.Image })
@@ -72,11 +73,15 @@ end
 
 	@method WaitLoading
 	@within gifFrame
+
+	@yields
 ]=]
 function gifFrame.WaitLoading(self: GifFrame, skipDelay: number?)
 	local t = os.clock()
+
 	while not self.Image.IsLoaded do
 		task.wait()
+
 		if (os.clock() - t) > (skipDelay or 10) then
 			warn("Loading may be so long...")
 			break
@@ -107,7 +112,7 @@ end
 	@within gifFrame
 ]=]
 function gifFrame.Show(self: GifFrame, parent: GuiBase)
-	self.Image.Position = UDim2.fromScale(0, 0)
+	self.Image.Size = UDim2.fromScale(1,1)
 	self.Image.Parent = parent
 end
 
@@ -120,7 +125,7 @@ end
 	@within gifFrame
 ]=]
 function gifFrame.Hide(self: GifFrame)
-	self.Image.Position = UDim2.fromScale(1, 1)
+	self.Image.Size = UDim2.new()
 	self.Image.Parent = Gui
 end
 
@@ -131,14 +136,14 @@ local function SetUpSelf(self: GifFrameStruct): GifFrame
 	setmetatable(self, { __index = gifFrame })
 
 	self.Image.Size = UDim2.fromScale(1, 1)
-	self.Image.Position = UDim2.fromScale(1, 1)
+	self.Image.Position = UDim2.new()
 
 	return self
 end
 
---[[
+--[=[
 	Set frame time
-]]
+]=]
 function gifFrame.SetTime(self: GifFrame, t: number)
 	self.Image:SetAttribute("Time", self.Time)
 	self.Time = t

@@ -1,4 +1,8 @@
 
+DOCS_MD =	\
+	docs/Build.md	\
+	docs/intro.md	\
+
 NPM_ROOT = $(shell npm root)
 MOONWAVE_CMD = build
 
@@ -6,7 +10,7 @@ $(NPM_ROOT)/.bin/moonwave:
 	npm i moonwave@latest
 
 
-$(BUILD_DIR)/html: $(NPM_ROOT)/.bin/moonwave moonwave.toml $(SOURCES) $(BUILD_DIR)
+$(BUILD_DIR)/html: $(NPM_ROOT)/.bin/moonwave moonwave.toml $(SOURCES) $(BUILD_DIR) $(DOCS_MD)
 	$(NPM_ROOT)/.bin/moonwave $(MOONWAVE_CMD) --out-dir $@
 
 docs: $(BUILD_DIR)/html

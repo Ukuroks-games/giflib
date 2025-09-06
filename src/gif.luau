@@ -71,6 +71,11 @@ export type GifStruct = {
 	IsLoaded: boolean,
 
 	--[[
+	
+	]]
+	PreloadBeforeShow: boolean,
+
+	--[[
 		Fire where gif animation completed
 	]]
 	Completed: RBXScriptSignal<>,
@@ -119,6 +124,7 @@ export type GifStruct = {
 	@field Destroying RBXScriptConnection
 	@field AnimationThread thread
 	@field Mode Mode
+	@field PreloadBeforeShow boolean
 
 	@within gif
 ]=]
@@ -230,7 +236,7 @@ end
 	If gif not been preloaded yet thins function will run [`gif:Preload`](#Preload) (you can skip that if you set arg noWaitPreload to true).
 
 	@param self gif
-	@param skip number?|boolean	-- skip preload. max delay in sec or boolean
+	@param skip number?|boolean?	-- skip preload. max delay in sec or boolean
 
 	@method StartAnimation
 
@@ -284,8 +290,16 @@ end
 	@within gif
 ]=]
 function gif.SetFrame(self: Gif, frame: number)
-	if self.Parent and self.Frames[frame] then
-		gifFrame.Show(self.Frames[frame], self.Parent)
+	local nextFrame: gifFrame.GifFrame? = self.Frames[frame]
+
+	if self.Parent and nextFrame then
+		
+		if self.PreloadBeforeShow then
+			nextFrame:Preload()
+			nextFrame:WaitLoading()
+		end
+
+		gifFrame.Show(nextFrame, self.Parent)
 
 		if self.Frame ~= 0 and self.Mode == gif.Mode.Replace then
 			gifFrame.Hide(self.Frames[self.Frame]) -- hide last frame
@@ -345,7 +359,7 @@ end
 	@within gif
 ]=]
 function gif.Next(self: Gif)
-	gif.SetFrame(self, self.Frame + 1)
+	self:SetFrame(self.Frame + 1)
 end
 
 --[=[
@@ -519,7 +533,8 @@ end
 	@param parent	{ Frame }?  -- gif surface. Parent for all frames
 	@param loopAnimation boolean? -- animation is looped 
 	@param ShowFirstFrameBeforeStart boolean?	-- is true first frame will showing before gif.StartAnimation call.
-	@param mode number?
+	@param mode number?	-- gif [Mode](#Mode)
+	@param preloadBeforeShow boolean?	-- preload only next frame. Will help where you haven't time to preload all
 
 	@return Gif -- created gif
 
@@ -531,7 +546,8 @@ function gif.new(
 	loopAnimation: boolean?,
 	ShowFirstFrameBeforeStart: boolean?,
 	mode: number?,
-	speed: number?
+	speed: number?,
+	preloadBeforeShow: boolean?
 ): Gif
 	local _CompletedEvent = Instance.new("BindableEvent")
 	local _DestroyingEvent = Instance.new("BindableEvent")
@@ -550,6 +566,7 @@ function gif.new(
 		AnimationThread = nil,
 		Mode = mode or gif.Mode.Replace,
 		Speed = speed or 1,
+		PreloadBeforeShow = preloadBeforeShow or false
 	}
 
 	setmetatable(self, { __index = gif })

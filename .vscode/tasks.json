@@ -1,10 +1,21 @@
 {
+    "command": "make",
+    "linux": {
+        "args": [
+            "-j$(nproc)"
+        ]
+    },
+    "osx": {
+        "args": [
+            "-j$(nproc)"
+        ],
+    },
+    
     "tasks": [
         {
             "type": "shell",
             "label": "Build",
             "detail": "Build tests place",
-            "command": "make",
             "args": [
                 "tests"
             ],
@@ -17,7 +28,6 @@
             "type": "shell",
             "label": "Generate sourcemap",
             "detail": "Generate sourcemap",
-            "command": "make",
             "args": [
                 "sourcemap"
             ],
@@ -29,7 +39,6 @@
             "type": "shell",
             "label": "Install programms",
             "detail": "Install programms using aftman",
-            "command": "make",
             "args": [
                 "aftman-install"
             ],
@@ -42,7 +51,6 @@
             "type": "shell",
             "label": "Install depends",
             "detail": "Install all project depends",
-            "command": "make",
             "args": [
                 "./Packages"
             ],
@@ -53,22 +61,8 @@
         },
         {
             "type": "shell",
-            "label": "Update depends",
-            "detail": "Update all project depends",
-            "command": "wally",
-            "args": [
-                "update"
-            ],
-            "group": {
-                "kind": "none"
-            },
-            "problemMatcher": [],
-        },
-        {
-            "type": "shell",
             "label": "Build rbxm",
             "detail": "Build rbxm library",
-            "command": "make",
             "args": [
                 "rbxm"
             ],
@@ -81,7 +75,6 @@
             "type": "shell",
             "label": "Clean",
             "detail": "Clean builded",
-            "command": "make",
             "args": [
                 "clean"
             ],
@@ -94,7 +87,6 @@
             "type": "shell",
             "label": "Publish",
             "detail": "Publish this as wally package",
-            "command": "make",
             "args": [
                 "publish"
             ],
@@ -107,7 +99,6 @@
             "type": "shell",
             "label": "Build docs",
             "detail": "Build html docs",
-            "command": "make",
             "args": [
                 "docs"
             ],
@@ -120,7 +111,6 @@
             "type": "shell",
             "label": "Watch docs changes",
             "detail": "Build html docs and watch changes in sources",
-            "command": "make",
             "args": [
                 "docs-dev",
             ],
