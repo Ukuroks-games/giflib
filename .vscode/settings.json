@@ -5,6 +5,7 @@
 	"cSpell.words": [
 		"gif",
 		"Giflib",
+		"moonwave",
 		"rbxassetid",
 		"rbxl",
 		"rbxm",
@@ -27,5 +28,8 @@
 	"makefile.configureOnOpen": false,
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features"
-	}
+	},
+	"luau-lsp.sourcemap.useVSCodeWatcher": true,
+	"luau-lsp.types.robloxSecurityLevel": "LocalUserSecurity",
+	"luau-lsp.diagnostics.workspace": false
 }
