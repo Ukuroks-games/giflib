@@ -4,7 +4,10 @@
             "type": "shell",
             "label": "Build",
             "detail": "Build tests place",
-            "command": "make tests && exit",
+            "command": "make",
+            "args": [
+                "tests"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -14,7 +17,10 @@
             "type": "shell",
             "label": "Generate sourcemap",
             "detail": "Generate sourcemap",
-            "command": "make sourcemap && exit",
+            "command": "make",
+            "args": [
+                "sourcemap"
+            ],
             "group": {
                 "kind": "none"
             },
@@ -23,7 +29,10 @@
             "type": "shell",
             "label": "Install programms",
             "detail": "Install programms using aftman",
-            "command": "aftman install && exit",
+            "command": "make",
+            "args": [
+                "aftman-install"
+            ],
             "group": {
                 "kind": "none"
             },
@@ -33,7 +42,10 @@
             "type": "shell",
             "label": "Install depends",
             "detail": "Install all project depends",
-            "command": "make ./Packages && exit",
+            "command": "make",
+            "args": [
+                "./Packages"
+            ],
             "group": {
                 "kind": "none"
             },
@@ -43,7 +55,10 @@
             "type": "shell",
             "label": "Update depends",
             "detail": "Update all project depends",
-            "command": "wally update && exit",
+            "command": "wally",
+            "args": [
+                "update"
+            ],
             "group": {
                 "kind": "none"
             },
@@ -53,7 +68,10 @@
             "type": "shell",
             "label": "Build rbxm",
             "detail": "Build rbxm library",
-            "command": "make rbxm && exit",
+            "command": "make",
+            "args": [
+                "rbxm"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -63,7 +81,10 @@
             "type": "shell",
             "label": "Clean",
             "detail": "Clean builded",
-            "command": "make clean && exit",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -73,22 +94,52 @@
             "type": "shell",
             "label": "Publish",
             "detail": "Publish this as wally package",
-            "command": "make publish && exit",
+            "command": "make",
+            "args": [
+                "publish"
+            ],
             "group": {
                 "kind": "none"
             },
             "problemMatcher": []
         },
+        {
+            "type": "shell",
+            "label": "Build docs",
+            "detail": "Build html docs",
+            "command": "make",
+            "args": [
+                "docs"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Watch docs changes",
+            "detail": "Build html docs and watch changes in sources",
+            "command": "make",
+            "args": [
+                "docs-dev",
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "isBackground": true
+        }
     ],
     "windows": {
         "options": {
-           "shell": {
+            "shell": {
                 "executable": "cmd",
                 "args": [
                     "/k"
                 ]
             }
-        },  
+        }
     },
     "version": "2.0.0"
 }

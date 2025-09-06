@@ -24,5 +24,8 @@
 	"luau-lsp.sourcemap.rojoProjectFile": "tests.project.json",
 	"luau-lsp.platform.type": "roblox",
 	"luau-lsp.sourcemap.generatorCommand": "make sourcemap",
-	"makefile.configureOnOpen": false
+	"makefile.configureOnOpen": false,
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	}
 }
