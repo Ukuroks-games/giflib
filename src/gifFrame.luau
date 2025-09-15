@@ -68,7 +68,6 @@ end
 --[=[
 	Wait image loading
 
-	@param self gifFrame
 	@param skipDelay number?
 
 	@method WaitLoading
@@ -92,9 +91,6 @@ end
 --[=[
 	Destroy gif frame
 
-	@param self gifFrame
-
-
 	@method Destroy
 	@within gifFrame
 ]=]
@@ -105,7 +101,6 @@ end
 --[=[
 	Show frame.
 
-	@param self gifFrame
 	@param parent Frame -- is Gif.ImageLabel
 
 	@method Show
@@ -120,7 +115,6 @@ end
 --[=[
 	Hide frame. Keep image in memory
 
-	@param self gifFrame
 	
 	@method Hide
 	@within gifFrame
@@ -132,8 +126,6 @@ end
 
 --[=[
 	don't keep image in memory
-
-	@param self gifFrame
 
 	@method Free
 	@within gifFrame

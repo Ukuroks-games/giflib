@@ -2,19 +2,54 @@
     "command": "make",
     "linux": {
         "args": [
-            "-j$(nproc)"
+            "-j$(nproc)",
+            "\"BUILD_DIR=/tmp/${workspaceFolderBasename}\""
         ]
     },
     "osx": {
         "args": [
             "-j$(nproc)"
-        ],
+        ]
     },
-    
     "tasks": [
         {
             "type": "shell",
-            "label": "Build",
+            "label": "Load depends",
+            "args": [
+                "Packages"
+            ],
+            "group": {
+                "kind": "none"
+            },
+            "detail": "Install all project depends",
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Publish",
+            "detail": "Putblish this library as wally package",
+            "args": [
+                "publish"
+            ],
+            "group": {
+                "kind": "none"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Package",
+            "detail": "Build wally .zip package",
+            "args": [
+                "package"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Build tests",
             "detail": "Build tests place",
             "args": [
                 "tests"
@@ -26,21 +61,33 @@
         },
         {
             "type": "shell",
-            "label": "Generate sourcemap",
-            "detail": "Generate sourcemap",
+            "label": "Build rbxm",
+            "detail": "Build rbxm library",
             "args": [
-                "sourcemap"
+                "rbxm"
             ],
             "group": {
-                "kind": "none"
-            },
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
             "type": "shell",
-            "label": "Install programms",
-            "detail": "Install programms using aftman",
+            "label": "Clean",
+            "detail": "Clean builded files",
             "args": [
-                "aftman-install"
+                "clean"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Generate sourcemap",
+            "detail": "Generate sourcemap for this library",
+            "args": [
+                "sourcemap"
             ],
             "group": {
                 "kind": "none"
@@ -49,46 +96,11 @@
         },
         {
             "type": "shell",
-            "label": "Install depends",
-            "detail": "Install all project depends",
+            "label": "Lint",
+            "detail": "Run selene",
             "args": [
-                "./Packages"
-            ],
-            "group": {
-                "kind": "none"
-            },
-            "problemMatcher": [],
-        },
-        {
-            "type": "shell",
-            "label": "Build rbxm",
-            "detail": "Build rbxm library",
-            "args": [
-                "rbxm"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
-            "type": "shell",
-            "label": "Clean",
-            "detail": "Clean builded",
-            "args": [
-                "clean"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
-            "type": "shell",
-            "label": "Publish",
-            "detail": "Publish this as wally package",
-            "args": [
-                "publish"
+                "lint",
+                "--ignore-errors"
             ],
             "group": {
                 "kind": "none"
@@ -98,28 +110,26 @@
         {
             "type": "shell",
             "label": "Build docs",
-            "detail": "Build html docs",
+            "detail": "Run selene",
             "args": [
                 "docs"
             ],
             "group": {
-                "kind": "build",
-                "isDefault": false
+                "kind": "build"
             }
         },
         {
             "type": "shell",
-            "label": "Watch docs changes",
+            "label": "Watch docs",
             "detail": "Build html docs and watch changes in sources",
             "args": [
-                "docs-dev",
+                "docs-dev"
             ],
             "group": {
-                "kind": "build",
-                "isDefault": false
+                "kind": "build"
             },
             "isBackground": true
-        }
+        },
     ],
     "windows": {
         "options": {
