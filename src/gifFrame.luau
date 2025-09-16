@@ -1,3 +1,5 @@
+--!strict
+
 -- Services
 
 local ContentProvider = game:GetService("ContentProvider")
@@ -23,7 +25,7 @@ local Gui = stdlib.utility.CreateOrFindInstance(
 	"GifPreloadGui",
 	"ScreenGui",
 	Players.LocalPlayer.PlayerGui
-)
+) :: ScreenGui
 
 Gui.ResetOnSpawn = false
 Gui.IgnoreGuiInset = true
