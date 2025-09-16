@@ -464,6 +464,7 @@ end
 
 	@method SetZIndex
 	@within gif
+	@since v0.4.2
 ]=]
 function gif.SetZIndex(self: Gif, zIndex: number)
 	for _, v in pairs(self.Frames) do
@@ -478,6 +479,7 @@ end
 	
 	@method SetFramesParam
 	@within gif
+	@since v0.4.2
 ]=]
 function gif.SetFramesParam<V>(self: Gif, param: string, value: V)
 	return pcall(function() 

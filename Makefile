@@ -78,11 +78,6 @@ publish-%: %.rbxl
 	rbxcloud experience publish -f $*.rbxl -p $(PLACE_ID) -u $(GAME_ID) -t published -a $(PUBLISH_TOKEN)
 
 
-# copy project to root for rojo
-%.project.json: projects/%.project.json
-	make "GENERATE_SOURCEMAP=$*" $@
-
-
 $(RBXM_BUILD):	library.project.json	$(SOURCES)	$(PackagesDir)
 	rojo build $< --output $@
 
