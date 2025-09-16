@@ -6,6 +6,8 @@
 		"gif",
 		"Giflib",
 		"moonwave",
+		"__newindex",
+		"pcall",
 		"rbxassetid",
 		"rbxl",
 		"rbxm",

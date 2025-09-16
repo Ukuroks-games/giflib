@@ -1,5 +1,3 @@
---!strict
-
 -- Services
 
 local ContentProvider = game:GetService("ContentProvider")
@@ -462,6 +460,34 @@ function gif.SetResampleMode(self: Gif, resampleMode: Enum.ResamplerMode)
 end
 
 --[=[
+	@param zIndex number
+
+	@method SetZIndex
+	@within gif
+]=]
+function gif.SetZIndex(self: Gif, zIndex: number)
+	for _, v in pairs(self.Frames) do
+		v.Image.ZIndex = zIndex
+	end
+end
+
+--[=[
+	@param param string
+	@param value V
+	@return pcall return
+	
+	@method SetFramesParam
+	@within gif
+]=]
+function gif.SetFramesParam<V>(self: Gif, param: string, value: V)
+	return pcall(function() 
+		for _, v in pairs(self.Frames) do
+			v.Image[param] = value
+		end
+	end)
+end
+
+--[=[
 	Set gif parent
 
 	@param newParent Frame?
@@ -480,7 +506,6 @@ end
 	@method GetTotalAnimationTime
 
 	@within gif
-
 
 	@since v0.3.1
 ]=]
@@ -525,8 +550,8 @@ end
 
 	@function new
 	
-	@param frames	{ [number]: GifFrame }?	-- list of frames
-	@param parent	{ Frame }?  -- gif surface. Parent for all frames
+	@param frames { [number]: gifFrame }?	-- list of frames
+	@param parent { Frame }?  -- gif surface. Parent for all frames
 	@param loopAnimation boolean? -- animation is looped 
 	@param ShowFirstFrameBeforeStart boolean?	-- is true first frame will showing before gif.StartAnimation call.
 	@param mode number?	-- gif [Mode](#Mode)
@@ -565,7 +590,7 @@ function gif.new(
 		PreloadBeforeShow = preloadBeforeShow or false,
 	}
 
-	setmetatable(self, { __index = gif })
+	setmetatable(self, { __index = gif, __newindex = gif.SetFramesParam })
 
 	gif.Hide(self)
 
