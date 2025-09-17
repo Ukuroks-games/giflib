@@ -499,7 +499,11 @@ end
 ]=]
 function gif.SetParent(self: Gif, newParent: Frame?)
 	self.Parent = newParent
-	self.Frames[self.Frame].Image.Parent = newParent
+	
+	local frame: gifFrame.GifFrame? = self.Frames[self.Frame]
+	if frame then
+		frame.Image.Parent = newParent
+	end
 end
 
 --[=[
