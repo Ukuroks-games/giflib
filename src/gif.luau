@@ -596,7 +596,7 @@ function gif.new(
 		PreloadBeforeShow = preloadBeforeShow or false,
 	}
 
-	setmetatable(self, { __index = gif, __newindex = gif.SetFramesParam })
+	setmetatable(self, { __index = gif})
 
 	gif.Hide(self)
 
