@@ -1,7 +1,7 @@
 
 
-tests.rbxl: $(PackagesDir) tests.project.json $(SOURCES) $(TEST_SOURCES)
-	rojo build tests.project.json --output $@
+tests.rbxl: tests.project.json	$(PackagesDir)	$(SOURCES)	$(TEST_SOURCES)
+	rojo build $< --output $@
 
 ALL_TESTS= \
 	tests.rbxl

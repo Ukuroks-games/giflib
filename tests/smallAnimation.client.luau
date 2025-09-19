@@ -1,3 +1,5 @@
+--!strict
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -9,9 +11,20 @@ imageLabel3.Parent = Players.LocalPlayer.PlayerGui:WaitForChild("ScreenGui")
 imageLabel3.Size = UDim2.fromScale(0.5, 0.5)
 imageLabel3.Position = UDim2.fromScale(0.5, 0.5)
 
-local combinedGif = giflib.gif.new({
+local gif = giflib.gif.new()
+
+gif.LoopAnimation = true
+gif:SetResampleMode(Enum.ResamplerMode.Pixelated)
+
+for i, v in pairs({
 	giflib.Frame.new("115357019166297", 0.2), -- 1
 	giflib.Frame.new("131955103378417", 0.2), -- 2
-}, imageLabel3, true, false, giflib.gif.Mode.Replace)
+}) do
+	gif:AddFrame(v)
+end
 
-combinedGif:StartAnimation()
+gif:SetParent(imageLabel3)
+
+
+
+gif:StartAnimation()

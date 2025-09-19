@@ -1,10 +1,13 @@
 
-SOURCES =	src/gif.luau	\
-			src/gifFrame.luau	\
-			src/init.luau
+SOURCES =	\
+	src/gif.luau	\
+	src/gifFrame.luau	\
+	src/init.luau
 
-TEST_SOURCES =	tests/test.client.luau	\
-				tests/combine.client.luau
+TEST_SOURCES =	\
+	tests/test.client.luau	\
+	tests/combine.client.luau	\
+	tests/smallAnimation.client.luau
 
 
 $(SOURCES) $(TEST_SOURCES): Makefiles/sources.mk
