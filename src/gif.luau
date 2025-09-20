@@ -108,6 +108,10 @@ export type GifStruct = {
 		animation speed
 	]]
 	Speed: number,
+
+	FrameParams: {
+		[string]: any
+	}
 }
 
 --[=[
@@ -385,9 +389,7 @@ function gif.SetBackgroundTransparency(self: Gif, newTransparency: number)
 	if self.Mode == gif.Mode.Combine then
 		self.Frames[1].Image.BackgroundTransparency = newTransparency
 	elseif self.Mode == gif.Mode.Replace then
-		for _, v in pairs(self.Frames) do
-			v.Image.BackgroundTransparency = newTransparency
-		end
+		self:SetFramesParam("BackgroundTransparency", newTransparency)
 	else
 		warn("unknown mode" .. tostring(self.Mode))
 	end
@@ -404,9 +406,7 @@ end
 	@since v0.1.8
 ]=]
 function gif.SetBackgroundColor(self: Gif, newColor: Color3)
-	for _, v in pairs(self.Frames) do
-		v.Image.BackgroundColor3 = newColor
-	end
+	self:SetFramesParam("BackgroundColor3", newColor)
 end
 
 --[=[
@@ -422,9 +422,7 @@ end
 	@since v0.1.8
 ]=]
 function gif.SetTransparency(self: Gif, newTransparency: number)
-	for _, v in pairs(self.Frames) do
-		v.Image.ImageTransparency = newTransparency
-	end
+	self:SetFramesParam("ImageTransparency", newTransparency)
 end
 
 --[=[
@@ -439,9 +437,7 @@ end
 	@since v0.1.8
 ]=]
 function gif.SetScaleType(self: Gif, scaleType: Enum.ScaleType)
-	for _, v in pairs(self.Frames) do
-		v.Image.ScaleType = scaleType
-	end
+	self:SetFramesParam("ScaleType", scaleType)
 end
 
 --[=[
@@ -454,9 +450,7 @@ end
 	@within gif
 ]=]
 function gif.SetResampleMode(self: Gif, resampleMode: Enum.ResamplerMode)
-	for _, v in pairs(self.Frames) do
-		v.Image.ResampleMode = resampleMode
-	end
+	self:SetFramesParam("ResampleMode", resampleMode)
 end
 
 --[=[
@@ -467,9 +461,7 @@ end
 	@since v0.4.2
 ]=]
 function gif.SetZIndex(self: Gif, zIndex: number)
-	for _, v in pairs(self.Frames) do
-		v.Image.ZIndex = zIndex
-	end
+	self:SetFramesParam("ZIndex", zIndex)
 end
 
 --[=[
@@ -486,6 +478,8 @@ function gif.SetFramesParam<V>(self: Gif, param: string, value: V)
 		for _, v in pairs(self.Frames) do
 			v.Image[param] = value
 		end
+
+		self.FrameParams[param] = value
 	end)
 end
 
@@ -534,7 +528,18 @@ end
 ]=]
 function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 	self.IsLoaded = self.IsLoaded and frame.Image.IsLoaded
+
 	table.insert(self.Frames, frame)
+
+	local s,e = pcall(function(...) 
+		for i, v in pairs(self.FrameParams) do
+			frame.Image[i] = v
+		end
+	end)
+
+	if not s then
+		error(e)
+	end
 end
 
 --[=[
@@ -594,6 +599,7 @@ function gif.new(
 		Mode = mode or gif.Mode.Replace,
 		Speed = speed or 1,
 		PreloadBeforeShow = preloadBeforeShow or false,
+		FrameParams = {}
 	}
 
 	setmetatable(self, { __index = gif})

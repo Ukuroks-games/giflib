@@ -16,7 +16,7 @@ local gif = giflib.gif.new()
 gif.LoopAnimation = true
 gif:SetResampleMode(Enum.ResamplerMode.Pixelated)
 
-for i, v in pairs({
+for _, v in pairs({
 	giflib.Frame.new("115357019166297", 0.2), -- 1
 	giflib.Frame.new("131955103378417", 0.2), -- 2
 }) do
