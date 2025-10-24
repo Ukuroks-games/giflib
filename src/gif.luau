@@ -531,7 +531,7 @@ function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 
 	table.insert(self.Frames, frame)
 
-	local s, e = pcall(function(...)
+	local s, e = pcall(function()
 		for i, v in pairs(self.FrameParams) do
 			frame.Image[i] = v
 		end
