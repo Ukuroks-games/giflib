@@ -590,6 +590,16 @@ local function setup(
 	return self
 end
 
+--[=[
+	Copy gif instance
+
+	@method Clone
+	@within gif
+
+	@since v0.4.5
+
+	@return gif
+]=]
 function gif.Clone(self: Gif): Gif
 	local CompleteEvent = self.CompletedEvent:Clone()
 	local DestroyingEvent = self.DestroyingEvent:Clone()
