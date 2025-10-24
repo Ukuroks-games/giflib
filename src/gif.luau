@@ -110,8 +110,8 @@ export type GifStruct = {
 	Speed: number,
 
 	FrameParams: {
-		[string]: any
-	}
+		[string]: any,
+	},
 }
 
 --[=[
@@ -304,7 +304,7 @@ function gif.SetFrame(self: Gif, frame: number)
 			gifFrame.Hide(self.Frames[self.Frame]) -- hide last frame
 		end
 	else
-		warn("Parent or self.Frames[" .. frame .. "] not exist")
+		warn("Parent or self.Frames[" .. frame .. "] not exist in gif", self)
 	end
 
 	self.Frame = frame
@@ -474,7 +474,7 @@ end
 	@since v0.4.2
 ]=]
 function gif.SetFramesParam<V>(self: Gif, param: string, value: V)
-	return pcall(function() 
+	return pcall(function()
 		for _, v in pairs(self.Frames) do
 			v.Image[param] = value
 		end
@@ -493,7 +493,7 @@ end
 ]=]
 function gif.SetParent(self: Gif, newParent: Frame?)
 	self.Parent = newParent
-	
+
 	local frame: gifFrame.GifFrame? = self.Frames[self.Frame]
 	if frame then
 		frame.Image.Parent = newParent
@@ -531,7 +531,7 @@ function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 
 	table.insert(self.Frames, frame)
 
-	local s,e = pcall(function(...) 
+	local s, e = pcall(function()
 		for i, v in pairs(self.FrameParams) do
 			frame.Image[i] = v
 		end
@@ -554,6 +554,79 @@ function gif.Free(self: Gif)
 	for _, v in pairs(self.Frames) do
 		v:Free()
 	end
+end
+
+local function setup(
+	self: GifStruct,
+	ShowFirstFrameBeforeStart: boolean?,
+	parent: GuiObject?
+): Gif
+	setmetatable(self, { __index = gif })
+
+	self:Hide()
+
+	if ShowFirstFrameBeforeStart == true then
+		if parent ~= nil then
+			gif.Next(self)
+		else
+			warn("gif parent is nil. So how show first frame?")
+		end
+	end
+
+	if self.Mode == gif.Mode.Combine then
+		for i = 2, #self.Frames do
+			self.Frames[i].Image.BackgroundTransparency = 1
+		end
+	end
+
+	self.Completed:Connect(function()
+		if self.LoopAnimation then
+			gif.RestartAnimation(self)
+		else
+			gif.StopAnimation(self)
+		end
+	end)
+
+	return self
+end
+
+--[=[
+	Copy gif instance
+
+	@method Clone
+	@within gif
+
+	@since v0.4.5
+
+	@return gif
+]=]
+function gif.Clone(self: Gif): Gif
+	local CompleteEvent = self.CompletedEvent:Clone()
+	local DestroyingEvent = self.DestroyingEvent:Clone()
+
+	local copy: GifStruct = {
+		Frames = {},
+		AnimationRunning = false,
+		LoopAnimation = self.LoopAnimation,
+		AnimationThread = nil,
+		CompletedEvent = CompleteEvent,
+		Completed = CompleteEvent.Event,
+		DestroyingEvent = DestroyingEvent,
+		Destroying = DestroyingEvent.Event,
+		Frame = self.Frame,
+		FrameParams = table.clone(self.FrameParams),
+		IsLoaded = self.IsLoaded,
+		Mode = self.Mode,
+		PreloadBeforeShow = self.PreloadBeforeShow,
+		Speed = self.Speed,
+		Parent = self.Parent,
+	}
+
+	for i, v in pairs(self.Frames) do
+		copy.Frames[i] = v:Clone()
+	end
+
+	return setup(copy)
 end
 
 --[=[
@@ -599,36 +672,10 @@ function gif.new(
 		Mode = mode or gif.Mode.Replace,
 		Speed = speed or 1,
 		PreloadBeforeShow = preloadBeforeShow or false,
-		FrameParams = {}
+		FrameParams = {},
 	}
 
-	setmetatable(self, { __index = gif})
-
-	gif.Hide(self)
-
-	if ShowFirstFrameBeforeStart == true then
-		if parent ~= nil then
-			gif.Next(self)
-		else
-			warn("gif parent is nil. So how show first frame?")
-		end
-	end
-
-	if mode == gif.Mode.Combine then
-		for i = 2, #self.Frames do
-			self.Frames[i].Image.BackgroundTransparency = 1
-		end
-	end
-
-	self.Completed:Connect(function()
-		if self.LoopAnimation then
-			gif.RestartAnimation(self)
-		else
-			gif.StopAnimation(self)
-		end
-	end)
-
-	return self
+	return setup(self, ShowFirstFrameBeforeStart, parent)
 end
 
 return gif

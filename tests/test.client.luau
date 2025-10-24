@@ -1,3 +1,5 @@
+--!strict
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -28,43 +30,51 @@ local myGif = giflib.gif.new(
 	true -- show first frame before animation loaded
 )
 
+local clone = myGif:Clone()
+clone:Hide()
+
 print("Total myGif animation time", myGif:GetTotalAnimationTime(), "sec")
 
-myGif:SetResampleMode(Enum.ResamplerMode.Pixelated)
-myGif:SetScaleType(Enum.ScaleType.Fit)
-myGif:SetBackgroundTransparency(1)
+local function test(g: giflib.Gif)
+	g:SetResampleMode(Enum.ResamplerMode.Pixelated)
+	g:SetScaleType(Enum.ScaleType.Fit)
+	g:SetBackgroundTransparency(1)
 
-print("Start")
-myGif:StartAnimation(true) -- without wait loading
+	print("Start")
+	g:StartAnimation(true) -- without wait loading
 
-wait(10)
-print("Stop Animation")
-myGif:StopAnimation()
+	wait(10)
+	print("Stop Animation")
+	g:StopAnimation()
 
-wait(10)
-print("Start")
-myGif:StartAnimation()
+	wait(10)
+	print("Start")
+	g:StartAnimation()
 
-wait(10)
-print("Set to Pixelated")
-myGif:SetResampleMode(Enum.ResamplerMode.Pixelated)
+	wait(10)
+	print("Set to Pixelated")
+	g:SetResampleMode(Enum.ResamplerMode.Pixelated)
 
-wait(10)
-print("Set fit scale type")
-myGif:SetScaleType(Enum.ScaleType.Fit)
+	wait(10)
+	print("Set fit scale type")
+	g:SetScaleType(Enum.ScaleType.Fit)
 
-wait(10)
-print("Speed x4")
-myGif.Speed = 4
+	wait(10)
+	print("Speed x4")
+	g.Speed = 4
 
-wait(10)
-print("Speed x0.25")
-myGif.Speed = 0.25
+	wait(10)
+	print("Speed x0.25")
+	g.Speed = 0.25
 
-wait(10)
-print("Free")
-myGif:Free()
+	wait(10)
+	print("Free")
+	g:Free()
 
-wait(10)
-print("Destroy")
-myGif:Destroy()
+	print("Destroy")
+	g:Destroy()
+end
+
+test(myGif)
+
+test(clone)

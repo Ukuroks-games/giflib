@@ -110,7 +110,7 @@ end
 ]=]
 function gifFrame.Show(self: GifFrame, parent: GuiBase)
 	self.Image.Visible = true
-	self.Image.Size = UDim2.fromScale(1,1)
+	self.Image.Size = UDim2.fromScale(1, 1)
 	self.Image.Parent = parent
 end
 
@@ -177,6 +177,14 @@ function gifFrame.FromInstance(image: ImageLabel): GifFrame
 	}
 
 	return SetUpSelf(self)
+end
+
+function gifFrame.Clone(self: GifFrame): GifFrame
+	local copy = table.clone(self)
+
+	copy.Image = Instance.fromExisting(self.Image)
+
+	return copy
 end
 
 --[=[
