@@ -9,6 +9,10 @@ For more details read [API](https://ukuroks-games.github.io/giflib/api/).
 
 ## Basic usage
 
+Giflib working is simple: just give frames to constructor and [`GuiObject`](https://create.roblox.com/docs/reference/engine/classes/GuiObject) as frame that contain frames.
+
+Frame is just image and delay. This lib just show frame and delay, show second and delay. 
+
 just small example:
 ```lua
 local Players = game:GetService("Players")
@@ -38,7 +42,7 @@ local myGif = giflib.gif.new(
 	},
 	imageLabel,
 	true,	-- animation is looped
-	true	-- show first frame before animation loaded
+	true	 -- show first frame before animation loaded
 )
 
 print("Total myGif animation time", myGif:GetTotalAnimationTime(), "sec")
