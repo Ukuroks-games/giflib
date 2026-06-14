@@ -537,6 +537,8 @@ function gif.AddFrame(self: Gif, frame: gifFrame.GifFrame)
 		end
 	end)
 
+	frame.Image.Name = tostring(#self.Frames)
+
 	if not s then
 		error(e)
 	end
@@ -556,14 +558,86 @@ function gif.Free(self: Gif)
 	end
 end
 
-local function setup(
-	self: GifStruct,
+--[=[
+	add fields to struct
+
+	useful for inherit
+
+	@function setupTable
+
+	@within gif
+
+	@since v0.5.0
+]=]
+function gif.setupTable(
+	self: {},
+	parent: GuiObject?,
+	frames: { [number]: gifFrame.GifFrame }?,
+	_CompletedEvent: BindableEvent?,
+	_DestroyingEvent: BindableEvent?,
+	loopAnimation: boolean?,
+	speed: number?,
+	preloadBeforeShow: boolean?,
+	mode: Mode?
+): Gif
+	if _CompletedEvent == nil then
+		_CompletedEvent = Instance.new("BindableEvent")
+	end
+
+	if _DestroyingEvent == nil then
+		_DestroyingEvent = Instance.new("BindableEvent")
+	end
+
+	self["Parent"] = parent
+	self["Frames"] = frames or {}
+	self["AnimationRunning"] = false
+	self["Completed"] = (_CompletedEvent :: BindableEvent).Event
+	self["CompletedEvent"] = _CompletedEvent
+	self["Destroying"] = (_DestroyingEvent :: BindableEvent).Event
+	self["DestroyingEvent"] = _DestroyingEvent
+	self["LoopAnimation"] = loopAnimation or false
+	self["IsLoaded"] = false
+	self["AnimationThread"] = nil
+	self["Mode"] = mode or gif.Mode.Replace
+	self["Speed"] = speed or 1
+	self["PreloadBeforeShow"] = preloadBeforeShow or false
+	self["FrameParams"] = {}
+
+	setmetatable(self, { __index = gif })
+
+	return self :: Gif
+end
+
+--[=[
+	first setup
+
+	useful for inherit
+
+	> Automatically hides animations to avoid interference
+
+	@function firstSetup
+
+	@within gif
+
+	@since v0.5.0
+]=]
+function gif.firstSetup(
+	self: Gif,
 	ShowFirstFrameBeforeStart: boolean?,
 	parent: GuiObject?
 ): Gif
-	setmetatable(self, { __index = gif })
-
 	self:Hide()
+
+	self.Frame = 1
+	self.CompletedEvent.Parent = self.Parent
+	self.CompletedEvent.Name = "Completed"
+	self.DestroyingEvent.Parent = self.Parent
+	self.DestroyingEvent.Name = "Destroying"
+
+	-- enumerate frames names
+	for i, v in pairs(self.Frames) do
+		v.Name = tostring(i)
+	end
 
 	if ShowFirstFrameBeforeStart == true then
 		if parent ~= nil then
@@ -601,32 +675,68 @@ end
 	@return gif
 ]=]
 function gif.Clone(self: Gif): Gif
-	local CompleteEvent = self.CompletedEvent:Clone()
-	local DestroyingEvent = self.DestroyingEvent:Clone()
-
-	local copy: GifStruct = {
-		Frames = {},
-		AnimationRunning = false,
-		LoopAnimation = self.LoopAnimation,
-		AnimationThread = nil,
-		CompletedEvent = CompleteEvent,
-		Completed = CompleteEvent.Event,
-		DestroyingEvent = DestroyingEvent,
-		Destroying = DestroyingEvent.Event,
-		Frame = self.Frame,
-		FrameParams = table.clone(self.FrameParams),
-		IsLoaded = self.IsLoaded,
-		Mode = self.Mode,
-		PreloadBeforeShow = self.PreloadBeforeShow,
-		Speed = self.Speed,
-		Parent = self.Parent,
-	}
+	local copy = gif.setupTable(
+		{},
+		self.Parent,
+		nil,
+		self.CompletedEvent:Clone(),
+		self.DestroyingEvent:Clone(),
+		self.LoopAnimation,
+		self.Speed,
+		self.PreloadBeforeShow,
+		self.Mode
+	)
 
 	for i, v in pairs(self.Frames) do
 		copy.Frames[i] = v:Clone()
 	end
 
-	return setup(copy)
+	return gif.firstSetup(copy)
+end
+
+--[=[
+	Creating a Gif1 animation from existing instances
+
+	This function simply creates a new table with existing instances. It's useful for creating GIF animations in Explorer instead of scripts.
+
+	This function checks the following attributes:
+	 + `LoopAnimation`
+	 + `Speed`
+	 + `PreloadBeforeShow`
+	 + `Mode`
+
+	> Don't use it to create GIF animations behind scripts. Creating two GIF instances may lead to undefined behavior.
+
+	> before call this function, all frames must be in container
+
+	@function fromExisting
+
+	@param container GuiObject -- Parent of gif and container for frames
+
+	@return Gif
+
+	@within gif
+]=]
+function gif.fromExisting(container: GuiObject): Gif
+	local frames = {}
+	for _, v in pairs(container:GetChildren()) do
+		local n = tonumber(v.Name)
+		if n and v.ClassName == "ImageLabel" then
+			frames[n] = gifFrame.FromInstance(v)
+		end
+	end
+
+	return gif.setupTable(
+		{},
+		container,
+		frames,
+		container:FindFirstChild("Completed"),
+		container:FindFirstChild("Destroying"),
+		container:GetAttribute("LoopAnimation"),
+		container:GetAttribute("Speed"),
+		container:GetAttribute("PreloadBeforeShow"),
+		container:GetAttribute("Mode")
+	)
 end
 
 --[=[
@@ -654,28 +764,21 @@ function gif.new(
 	speed: number?,
 	preloadBeforeShow: boolean?
 ): Gif
-	local _CompletedEvent = Instance.new("BindableEvent")
-	local _DestroyingEvent = Instance.new("BindableEvent")
-
-	local self: GifStruct = {
-		Parent = parent,
-		Frames = frames or {},
-		Frame = 0,
-		AnimationRunning = false,
-		Completed = _CompletedEvent.Event,
-		CompletedEvent = _CompletedEvent,
-		Destroying = _DestroyingEvent.Event,
-		DestroyingEvent = _DestroyingEvent,
-		LoopAnimation = loopAnimation or false,
-		IsLoaded = false,
-		AnimationThread = nil,
-		Mode = mode or gif.Mode.Replace,
-		Speed = speed or 1,
-		PreloadBeforeShow = preloadBeforeShow or false,
-		FrameParams = {},
-	}
-
-	return setup(self, ShowFirstFrameBeforeStart, parent)
+	return gif.firstSetup(
+		gif.setupTable(
+			{},
+			parent,
+			frames,
+			Instance.new("BindableEvent"),
+			Instance.new("BindableEvent"),
+			loopAnimation,
+			speed,
+			preloadBeforeShow,
+			mode
+		),
+		ShowFirstFrameBeforeStart,
+		parent
+	)
 end
 
 return gif
