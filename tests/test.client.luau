@@ -31,7 +31,6 @@ local myGif = giflib.gif.new(
 )
 
 local clone = myGif:Clone()
-clone:Hide()
 
 print("Total myGif animation time", myGif:GetTotalAnimationTime(), "sec")
 
